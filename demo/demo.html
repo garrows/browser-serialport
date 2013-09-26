@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>test sg-joystick</title>
+
+	<link rel="stylesheet" href="bootstrap.min.css">
+	<link rel="stylesheet" href="demo.css">
+
+	<script src="../build/build.js"></script>
+
+</head>
+<body>
+
+	<div class="container">
+		
+		<div class="page-header">
+			
+			<h1>Browser SerialPort Demo</h1>
+			
+			<div class="form-inline" role="form">
+				<div class="form-group">
+					<label for="portName">Portname:</label>
+					<input id="portName" type="textbox" class="form-control"></input>
+				</div>
+
+				<button id="connect" class="btn btn-default">Connect</button>
+
+				<div class="form-group">
+					<label for="input">Input:</label>
+					<input id="input" type="textbox" class="form-control"></input>
+				</div>
+
+				<button id="send" class="btn btn-default">Send</button>
+			</div>
+
+		</div>
+
+	</div>
+
+	<script>
+
+		var domready = require('domready')
+		,	dom = require('dom')
+		,	BrowserSerialport = require('browser-serialport')
+		
+		domready(function() {
+			
+			serial = new BrowserSerialport();
+			serial.open();
+
+			dom("#connect").on("click", function() {
+				var portname = dom("#portName").els[0].input;
+			
+				serial.open()
+			});
+
+		}) 
+
+
+	</script>
+	
+</body>
+</html>
