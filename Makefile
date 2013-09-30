@@ -1,8 +1,8 @@
 build:
 	@make install
-	@component build --dev
-	
-
+	@component build
+	@component build --name browser-serialport --out demo
+	@browserify -r async > demo/bundle.js
 install:
 	@component install --dev > /dev/null
 

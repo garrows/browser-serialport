@@ -2,12 +2,15 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>test sg-joystick</title>
+	<title>SerialPort</title>
 
 	<link rel="stylesheet" href="bootstrap.min.css">
 	<link rel="stylesheet" href="demo.css">
 
-	<script src="../build/build.js"></script>
+	<script src="browser-serialport.js"></script>
+	<!--<script src="bundle.js"></script>-->
+	<!--<script src="build.js"></script>-->
+	<script src="main.js"></script>
 
 </head>
 <body>
@@ -38,27 +41,5 @@
 
 	</div>
 
-	<script>
-
-		var domready = require('domready')
-		,	dom = require('dom')
-		,	BrowserSerialport = require('browser-serialport')
-		
-		domready(function() {
-			
-			serial = new BrowserSerialport();
-			serial.open();
-
-			dom("#connect").on("click", function() {
-				var portname = dom("#portName").els[0].input;
-			
-				serial.open()
-			});
-
-		}) 
-
-
-	</script>
-	
 </body>
 </html>
