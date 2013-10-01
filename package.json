@@ -8,7 +8,6 @@
     "test": "tests"
   },
   "dependencies": {
-    "bops": "~0.1.0"
   },
   "devDependencies": {},
   "scripts": {
