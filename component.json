@@ -1,11 +1,11 @@
 {
-  "name": "browser-serialport",
+  "name": "serialport",
   "repo": "garrows/browser-serialport",
   "description": "Robots in the browser. Just like node-serialport but for browser apps.",
   "version": "0.0.1",
   "keywords": [],
   "dependencies": {
-    
+    "chrisdickinson/bops": "*"
   },
   "development":{
      

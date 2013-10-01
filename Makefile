@@ -1,10 +1,10 @@
 build:
 	@make install
-	@component build
-	@component build --name browser-serialport --out demo
+	@component build --name serialport
+	@component build --name serialport --out demo
 	@browserify -r async > demo/bundle.js
 install:
-	@component install --dev > /dev/null
+	@component install --dev
 
 demo:
 	@google-chrome ./demo/demo.html
