@@ -1,0 +1,34 @@
+{
+  "name": "serialport",
+  "version": "0.0.1",
+  "description": "Robots in the browser. Just like node-serialport but for browser/chrome apps.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "bops": "~0.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/garrows/browser-serialport"
+  },
+  "keywords": [
+    "serial",
+    "firmata",
+    "nodebots",
+    "chromebots",
+    "browserbots",
+    "robot",
+    "robots"
+  ],
+  "author": "Glen Arrowsmith @garrows",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/garrows/browser-serialport/issues"
+  }
+}
