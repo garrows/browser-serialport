@@ -1,4 +1,4 @@
-var SerialPort = require('serialport').SerialPort;
+var SerialPort = require('../index.js').SerialPort;
 
 var sp = new SerialPort("/dev/usb0", {
     baudrate: 57600,

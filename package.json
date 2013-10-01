@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Robots in the browser. Just like node-serialport but for browser/chrome apps.",
   "main": "index.js",
+  "browser": "./index.js",
   "directories": {
     "test": "tests"
   },
