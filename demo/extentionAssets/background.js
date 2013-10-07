@@ -2,13 +2,13 @@
 chrome.app.runtime.onLaunched.addListener(function() {
 	chrome.app.window.create('../demo.html', {
 		bounds: {
-			width: 800,
-			height: 600,
+			width: 1200,
+			height: 1000,
 			left: 100,
 			top: 100
 		},
-		minWidth: 800,
-		minHeight: 600
+		minWidth: 1200,
+		minHeight: 1000
 	});
 });
 
