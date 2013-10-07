@@ -63,28 +63,34 @@ SerialPort.prototype.onOpen = function (callback, openInfo) {
 };
 
 SerialPort.prototype.onRead = function (readInfo) {
-	var uint8View = new Uint8Array(readInfo.data);
-	var string = "";
-	for (var i = 0; i < readInfo.bytesRead; i++) {
-		string += String.fromCharCode(uint8View[i]);
-	}
-	if (string != "") {
-		console.log("Read:", string);
-	}
+	if (readInfo && readInfo.bytesRead > 0) {
 
-	//Maybe this should be a Buffer()
-	this.publishEvent("data", readInfo.data);
-	this.publishEvent("dataString", string);
+		var uint8View = new Uint8Array(readInfo.data);
+		var string = "";
+		for (var i = 0; i < readInfo.bytesRead; i++) {
+			string += String.fromCharCode(uint8View[i]);
+		}
+		if (string != "") {
+			console.log("Read:", string);
+		}
+
+		//console.log("Got data", string, readInfo.data);	
+
+		//Maybe this should be a Buffer()
+		this.publishEvent("data", readInfo.data);
+		this.publishEvent("dataString", string);
+	}
 
 	chrome.serial.read(this.connectionId, this.options.buffersize, this.proxy('onRead'));
 }
 
 SerialPort.prototype.write = function (buffer, callback) {
+	if (typeof callback != "function") { callback = function() {}; }
 	chrome.serial.write(this.connectionId, buffer, callback);  
 };
 
 SerialPort.prototype.writeString = function (string, callback) {
-	chrome.serial.write(this.connectionId, str2ab(string), callback);  
+	this.write(str2ab(string), callback);  
 };
 
 SerialPort.prototype.close = function (callback) {

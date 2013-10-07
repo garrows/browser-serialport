@@ -1,4 +1,32 @@
+#settings select {
+	width: 150px;
+}
 
-.btn {
-	margin-top: 24px;
+#settings button {
+	width: 120px;
+}
+
+#connected-container {
+	display: none;
+}
+
+.input-group {
+	width: 100%;
+}
+
+.input-group label {
+	display: block;
+}
+
+.input-group .input {
+	display: inline;
+	width: 80%;
+}
+
+.input-group button {
+	width: 15%;
+}
+
+#output {
+	width: 96%;
 }

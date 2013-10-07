@@ -1,6 +1,6 @@
 build:
 	@make install
-	@browserify demo/demo.js -o demo/serialport.js
+	@browserify demo/demo.js -o demo/bundle.js
 install:
 	@npm install
 
