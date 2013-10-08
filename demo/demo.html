@@ -17,59 +17,74 @@
 		<div class="page-header">
 			
 			<h1>Browser Serial Port Monitor</h1>
-			
-			<div id="settings" class="form-inline" role="form">
-				
-				<div class="form-group">
+
+			<div id="settings" class="row">
+
+				<div class="col-sm-3">
 
 					<label for="portPath">Port Path:</label>
 					<select id="portPath" class="form-control"></select>
-				
+
+				</div>
+
+				<div class="col-sm-3">
+
 					<label for="baudrate">Baud Rate:</label>
 					<select id="baudrate" class="form-control">
-						<option = value="115200">115200</option>
-						<option = value="57600">57600</option>
-						<option = value="38400">38400</option>
-						<option = value="19200">19200</option>
-						<option = value="9600" selected>9600</option>
-						<option = value="4800">4800</option>
-						<option = value="2400">2400</option>
-						<option = value="1800">1800</option>
-						<option = value="1200">1200</option>
-						<option = value="600">600</option>
-						<option = value="300">300</option>
-						<option = value="200">200</option>
-						<option = value="150">150</option>
-						<option = value="134">134</option>
-						<option = value="110">110</option>
-						<option = value="75">75</option>
-						<option = value="50">50</option>
+						<option value="115200">115200</option>
+						<option value="57600">57600</option>
+						<option value="38400">38400</option>
+						<option value="19200">19200</option>
+						<option value="9600" selected>9600</option>
+						<option value="4800">4800</option>
+						<option value="2400">2400</option>
+						<option value="1800">1800</option>
+						<option value="1200">1200</option>
+						<option value="600">600</option>
+						<option value="300">300</option>
+						<option value="200">200</option>
+						<option value="150">150</option>
+						<option value="134">134</option>
+						<option value="110">110</option>
+						<option value="75">75</option>
+						<option value="50">50</option>
 					</select>
-				
+
+				</div>
+
+				<div class="col-sm-3">
 					<button id="connect" class="btn btn-primary">Connect</button>
-				
 				</div>
 
 			</div>
 
 			<div id="connected-container">
 
-				<div class="form input-group" role="form">
+				<div class="row">
 
-					<label for="input">Input:</label>
-					<input id="input" type="textbox" class="form-control input"></input>
-					
-					<button id="send" class="btn btn-default">Send</button>
+					<div class="col-md-9">
+
+						<div class="input-group">
+
+							<label for="input">Input:</label>
+							<input id="input" type="text" class="form-control" />
+							<span class="input-group-btn">
+								<button id="send" class="btn btn-default">Send</button>
+							</span>
+
+						</div>
+
+					</div>
 
 				</div>
-				
-				<div class="form" role="form">
 
-					<div class="form-group">
-				
+				<div class="row">
+
+					<div class="col-md-9">
+
 						<label for="output">Output:</label>
 						<textarea id="output" class="form-control" rows="20"></textarea>
-				
+
 					</div>
 
 				</div>
