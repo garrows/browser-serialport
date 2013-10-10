@@ -3,12 +3,15 @@
 
   "name": "Serial Monitor",
   "description": "Monitors your serial port and allows you to read and write to it like you could with Arduino's IDE.",
-  "version": "1.0",
+
+  "version": "1.0.4",
+  
   "app": {
     "background": {
-      "scripts": ["extentionAssets/background.js"]
+      "scripts": ["background.js"]
     }
   },
+  
   "icons": {
     "16": "extentionAssets/icon-16x16.jpeg",
     "128": "extentionAssets/icon-128x128.jpeg"
