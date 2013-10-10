@@ -36,7 +36,7 @@ The library tries to emulate the node-serialport library with some minor differe
 
 ```js
 
-var SerialPort = require("serialport").SerialPort;
+var SerialPort = require("browser-browser-serialport").SerialPort;
 var sp = new SerialPort(port, {
     baudrate: 9600,
     buffersize: 1
@@ -73,7 +73,7 @@ You can also list the available serialports.
 
 ```js
 	
-var SerialPortList = require("serialport").SerialPortList;
+var SerialPortList = require("browser-serialport").SerialPortList;
 
 var list = new SerialPortList(function(portsArray) {
 	console.log("Ports available", portsArray)
