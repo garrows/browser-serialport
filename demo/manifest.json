@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
 
-  "name": "Browser SerialPort Component Test",
-  "description": "Robots in the browser. Just like node-serialport but for browser apps.",
+  "name": "Serial Monitor",
+  "description": "Monitors your serial port and allows you to read and write to it like you could with Arduino's IDE.",
   "version": "1.0",
   "app": {
     "background": {
