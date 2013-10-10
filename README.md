@@ -22,7 +22,9 @@ You will not be able to add this to your normal website.
 
 This library only works in a [Chrome Packaged App](http://developer.chrome.com/apps/about_apps.html) as this is the only way to get access to the [serial ports API](http://developer.chrome.com/apps/serial.html) in the browser.
 
-There is currently no Firefox extention support but that might come soon if possible.
+If you want help making your first Chrome App, read the getting ["Create Your First App"](http://developer.chrome.com/apps/first_app.html) tutorial.
+
+There is currently no Firefox extension support but that might come soon if possible.
 
 ## Installation
 
@@ -32,7 +34,7 @@ npm install browser-serialport
 
 ## Usage
 
-The library tries to emulate the node-serialport library with some minor differences. If you find some breaking inconsistancies, please submit an issue.
+The library tries to emulate the node-serialport library with some minor differences. If you find some breaking inconsistencies, please submit an issue. 
 
 ```js
 
