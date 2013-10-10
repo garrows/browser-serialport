@@ -5,6 +5,6 @@ install:
 	@npm install
 
 demo:
-	@google-chrome ./demo/demo.html
+	@google-chrome --load-and-launch-app=demo/
 	
 .PHONY: build install demo
