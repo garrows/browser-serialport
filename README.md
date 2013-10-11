@@ -11,7 +11,7 @@ Robots in the browser. Just like [node-serialport](https://npmjs.org/package/ser
 
 ## Demos
 
-A serial monitor/writer is available in the chrome web store (Link coming soon). Source is available in the demo directory.
+A [Serial Monitor](https://chrome.google.com/webstore/detail/serial-monitor/ohncdkkhephpakbbecnkclhjkmbjnmlo) (like the one in the Arduino IDE) is available in the chrome web store. Source is available in the demo directory.
 
 A Jonny-five demo is also coming soon.
 
