@@ -1,25 +1,31 @@
-var SerialPort = require('../index.js').SerialPort;
-var SerialPortList = require('../index.js').SerialPortList;
+var SerialPortLib = require('../index.js');
+var SerialPort = SerialPortLib.SerialPort;
 
-var list = new SerialPortList(function(ports) {
-
+SerialPortLib.list(function(err, ports) {
 	var portsPath = document.getElementById("portPath");
-	for (var i = 0; i < ports.length; i++) {
-		portsPath.options[i] = new Option(ports[i], ports[i]);
 
-		if (ports[i].indexOf("USB") !== -1) {
-			portsPath.options[i].selected = true;			
+	if (err) {
+		console.log("Error listing ports", err);
+		portsPath.options[0] = new Option(err, "ERROR:" + err);
+		portsPath.options[0].selected = true;			
+		return;
+	} else {
+		for (var i = 0; i < ports.length; i++) {
+			portsPath.options[i] = new Option(ports[i].comName, ports[i].comName);
+
+			if (ports[i].comName.indexOf("USB") !== -1) {
+				portsPath.options[i].selected = true;			
+			}
 		}
+
+		var connectButton = document.getElementById("connect");
+		connectButton.onclick = function() {
+			var port = portsPath.options[portsPath.selectedIndex].value;
+			var baudrateElement = document.getElementById("baudrate");
+			var baudrate = baudrateElement.options[baudrateElement.selectedIndex].value;
+			connect(port, baudrate);
+		};
 	}
-
-	var connectButton = document.getElementById("connect");
-	connectButton.onclick = function() {
-		var port = portsPath.options[portsPath.selectedIndex].value;
-		var baudrateElement = document.getElementById("baudrate");
-		var baudrate = baudrateElement.options[baudrateElement.selectedIndex].value;
-		connect(port, baudrate);
-	};
-
 });
 
 

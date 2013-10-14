@@ -3,7 +3,7 @@
 function SerialPort(path, options, openImmediately) {
 	console.log("SerialPort constructed.");
 
-	this.portPath = path;
+	this.comName = path;
 
 	if (options) {
 		for (var key in this.options) {
@@ -18,7 +18,7 @@ function SerialPort(path, options, openImmediately) {
 	if (typeof chrome != "undefined" && chrome.serial) {
 		var self = this;
 
-		if (openImmediately) {
+		if (openImmediately != false) {
 			this.open();
 		}
 
@@ -34,13 +34,13 @@ SerialPort.prototype.options = {
 
 SerialPort.prototype.connectionId = -1;
 
-SerialPort.prototype.portPath = "";
+SerialPort.prototype.comName = "";
 
 SerialPort.prototype.eventListeners = {};
 
 SerialPort.prototype.open = function (callback) {
-	console.log("Opening ", this.portPath);
-	chrome.serial.open(this.portPath, {bitrate: this.options.baudrate}, this.proxy('onOpen', callback));
+	console.log("Opening ", this.comName);
+	chrome.serial.open(this.comName, {bitrate: this.options.baudrate}, this.proxy('onOpen', callback));
 };
 
 SerialPort.prototype.onOpen = function (callback, openInfo) {
@@ -70,14 +70,11 @@ SerialPort.prototype.onRead = function (readInfo) {
 		for (var i = 0; i < readInfo.bytesRead; i++) {
 			string += String.fromCharCode(uint8View[i]);
 		}
-		if (string != "") {
-			console.log("Read:", string);
-		}
 
 		//console.log("Got data", string, readInfo.data);	
 
 		//Maybe this should be a Buffer()
-		this.publishEvent("data", readInfo.data);
+		this.publishEvent("data", uint8View);
 		this.publishEvent("dataString", string);
 	}
 
@@ -86,6 +83,12 @@ SerialPort.prototype.onRead = function (readInfo) {
 
 SerialPort.prototype.write = function (buffer, callback) {
 	if (typeof callback != "function") { callback = function() {}; }
+
+	//Make sure its not a browserify faux Buffer.
+	if (buffer instanceof ArrayBuffer == false) {
+		buffer = buffer2ArrayBuffer(buffer);
+	}
+
 	chrome.serial.write(this.connectionId, buffer, callback);  
 };
 
@@ -152,27 +155,43 @@ SerialPort.prototype.proxy = function () {
 	return func;
 }
 
-
 function SerialPortList(callback) {
 	if (typeof chrome != "undefined" && chrome.serial) {
-		chrome.serial.getPorts(callback);
+		chrome.serial.getPorts(function(ports) {
+			var portObjects = Array(ports.length);
+			for (var i = 0; i < ports.length; i++) {
+				portObjects[i] = new SerialPort(ports[i], null, false);
+			}
+			callback(null, portObjects);
+		});
 	} else {
-		throw "No access to serial ports. Try loading as a Chrome Application.";
+		callback("No access to serial ports. Try loading as a Chrome Application.", null);
 	}
-}
+};
 
 // Convert string to ArrayBuffer
 function str2ab(str) {
-  var buf=new ArrayBuffer(str.length);
-  var bufView=new Uint8Array(buf);
-  for (var i=0; i<str.length; i++) {
-	bufView[i]=str.charCodeAt(i);
-  }
-  return buf;
+	var buf = new ArrayBuffer(str.length);
+	var bufView = new Uint8Array(buf);
+	for (var i = 0; i < str.length; i++) {
+		bufView[i] = str.charCodeAt(i);
+	}
+	return buf;
+}
+
+// Convert buffer to ArrayBuffer
+function buffer2ArrayBuffer(buffer) {
+	var buf = new ArrayBuffer(buffer.length);
+	var bufView = new Uint8Array(buf);
+	for (var i = 0; i < buffer.length; i++) {
+		bufView[i] = buffer[i];
+	}
+	return buf;
 }
 
 module.exports = { 
 	SerialPort: SerialPort,
-	SerialPortList: SerialPortList
+	list: SerialPortList,
+	used: [] //TODO: Populate this somewhere.
 };
 

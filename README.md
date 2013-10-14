@@ -75,10 +75,12 @@ You can also list the available serialports.
 
 ```js
 	
-var SerialPortList = require("browser-serialport").SerialPortList;
+var SerialPortLib = require("browser-serialport");
 
-var list = new SerialPortList(function(portsArray) {
-	console.log("Ports available", portsArray)
+SerialPortLib.list(function(error, portsArray) {
+	if (!error) {
+		console.log("Ports available", portsArray);
+	}
 });
 
 ```
