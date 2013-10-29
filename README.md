@@ -6,14 +6,14 @@ Robots in the browser. Just like [node-serialport](https://npmjs.org/package/ser
 
 ## Why not Node.js?
 
-[Nodebots](http://nodebots.io/) are awesome but HTML5 apps have access to a lot of APIs that make sense for robotics like the [GamepadAPI](http://www.html5rocks.com/en/tutorials/doodles/gamepad/), [WebRTC Video and Data](http://www.webrtc.org/), [Web Speech API](http://www.google.com/intl/en/chrome/demos/speech.html), etc. Also you get a nice GUI and its easier to run. I'm planning to bring [Jonny-Five](https://github.com/rwaldron/johnny-five) to work in the browser as well by modifying it's dependancy [Firmata](https://github.com/jgautier/firmata) to use browser-serialport.
+[Nodebots](http://nodebots.io/) are awesome but HTML5 apps have access to a lot of APIs that make sense for robotics like the [GamepadAPI](http://www.html5rocks.com/en/tutorials/doodles/gamepad/), [WebRTC Video and Data](http://www.webrtc.org/), [Web Speech API](http://www.google.com/intl/en/chrome/demos/speech.html), etc. Also you get a nice GUI and its easier to run. I have also made a fork of [Johnny-Five](https://github.com/garrows/johnny-five) to work with [Browserify](http://browserify.org/) as well by modifying it's dependancy [Firmata](https://github.com/garrows/firmata) to use browser-serialport. 
 
 
 ## Demos
 
 A [Serial Monitor](https://chrome.google.com/webstore/detail/serial-monitor/ohncdkkhephpakbbecnkclhjkmbjnmlo) (like the one in the Arduino IDE) is available in the chrome web store. Source is available in the demo directory.
 
-A Jonny-five demo is also coming soon.
+I made a [Johnny Five Demo](https://chrome.google.com/webstore/detail/johnny-five-demo/ikbnclceoeficmoaocnoggdaiacmalfo) that uses browser-serialport too. More features coming to that soon though.  
 
 
 ## Restrictions
@@ -34,7 +34,7 @@ npm install browser-serialport
 
 ## Usage
 
-The library tries to emulate the node-serialport library with some minor differences. If you find some breaking inconsistencies, please submit an issue. 
+The library tries to emulate the node-serialport library with some minor differences. If you find some breaking inconsistencies, please submit an issue. I've tested using [Browserify](http://browserify.org/) for browser module loading. Please let me know if it doesn't work for others.
 
 ```js
 
