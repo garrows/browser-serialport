@@ -1,6 +1,6 @@
 {
   "name": "browser-serialport",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Robots in the browser. Just like node-serialport but for browser/chrome apps.",
   "main": "index.js",
   "browser": "./index.js",
