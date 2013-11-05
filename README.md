@@ -1,4 +1,3 @@
-
 # browser-serialport
 
 Robots in the browser. Just like [node-serialport](https://npmjs.org/package/serialport) but for browser apps. 
@@ -38,7 +37,7 @@ The library tries to emulate the node-serialport library with some minor differe
 
 ```js
 
-var SerialPort = require("browser-browser-serialport").SerialPort;
+var SerialPort = require("browser-serialport").SerialPort;
 var sp = new SerialPort(port, {
     baudrate: 9600,
     buffersize: 1
