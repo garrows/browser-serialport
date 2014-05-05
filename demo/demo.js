@@ -11,9 +11,9 @@ SerialPortLib.list(function(err, ports) {
 		return;
 	} else {
 		for (var i = 0; i < ports.length; i++) {
-			portsPath.options[i] = new Option(ports[i].comName.path, ports[i].comName.path);
+			portsPath.options[i] = new Option(ports[i].comName, ports[i].comName);
 
-			if (ports[i].comName.path.toLowerCase().indexOf("usb") !== -1) {
+			if (ports[i].comName.toLowerCase().indexOf("usb") !== -1) {
 				portsPath.options[i].selected = true;
 			}
 		}
