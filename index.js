@@ -40,7 +40,7 @@ SerialPort.prototype.eventListeners = {};
 
 SerialPort.prototype.open = function (callback) {
 	console.log("Opening ", this.comName);
-	chrome.serial.open(this.comName, {bitrate: this.options.baudrate}, this.proxy('onOpen', callback));
+	chrome.serial.connect(this.comName, {bitrate: parseInt(this.options.baudrate)}, this.proxy('onOpen', callback));
 };
 
 SerialPort.prototype.onOpen = function (callback, openInfo) {
@@ -50,35 +50,33 @@ SerialPort.prototype.onOpen = function (callback, openInfo) {
 		this.publishEvent("error", "Could not open port.");
 		return;
 	}
-	
+
 	this.publishEvent("open", openInfo);
 
-	
+
 	console.log('Connected to port.', this.connectionId);
-	
+
 	typeof callback == "function" && callback(openInfo);
 
-	chrome.serial.read(this.connectionId, this.options.buffersize, this.proxy('onRead'));
-	
+	chrome.serial.onReceive.addListener(this.proxy('onRead'));
+
 };
 
 SerialPort.prototype.onRead = function (readInfo) {
-	if (readInfo && readInfo.bytesRead > 0) {
+	if (readInfo && this.connectionId == readInfo.connectionId) {
 
 		var uint8View = new Uint8Array(readInfo.data);
 		var string = "";
-		for (var i = 0; i < readInfo.bytesRead; i++) {
+		for (var i = 0; i < readInfo.data.byteLength; i++) {
 			string += String.fromCharCode(uint8View[i]);
 		}
 
-		//console.log("Got data", string, readInfo.data);	
+		//console.log("Got data", string, readInfo.data);
 
 		//Maybe this should be a Buffer()
 		this.publishEvent("data", uint8View);
 		this.publishEvent("dataString", string);
 	}
-
-	chrome.serial.read(this.connectionId, this.options.buffersize, this.proxy('onRead'));
 }
 
 SerialPort.prototype.write = function (buffer, callback) {
@@ -89,11 +87,11 @@ SerialPort.prototype.write = function (buffer, callback) {
 		buffer = buffer2ArrayBuffer(buffer);
 	}
 
-	chrome.serial.write(this.connectionId, buffer, callback);  
+	chrome.serial.send(this.connectionId, buffer, callback);
 };
 
 SerialPort.prototype.writeString = function (string, callback) {
-	this.write(str2ab(string), callback);  
+	this.write(str2ab(string), callback);
 };
 
 SerialPort.prototype.close = function (callback) {
@@ -117,7 +115,7 @@ SerialPort.prototype.on = function (eventName, callback) {
 		this.eventListeners[eventName] = [];
 	}
 	if (typeof callback == "function") {
-		this.eventListeners[eventName].push(callback);		
+		this.eventListeners[eventName].push(callback);
 	} else {
 		throw "can not subscribe with a non function callback";
 	}
@@ -157,7 +155,7 @@ SerialPort.prototype.proxy = function () {
 
 function SerialPortList(callback) {
 	if (typeof chrome != "undefined" && chrome.serial) {
-		chrome.serial.getPorts(function(ports) {
+		chrome.serial.getDevices(function(ports) {
 			var portObjects = Array(ports.length);
 			for (var i = 0; i < ports.length; i++) {
 				portObjects[i] = new SerialPort(ports[i], null, false);
@@ -189,9 +187,8 @@ function buffer2ArrayBuffer(buffer) {
 	return buf;
 }
 
-module.exports = { 
+module.exports = {
 	SerialPort: SerialPort,
 	list: SerialPortList,
 	used: [] //TODO: Populate this somewhere.
 };
-
