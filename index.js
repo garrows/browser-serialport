@@ -15,7 +15,7 @@ function SerialPort(path, options, openImmediately) {
 		}
 	}
 
-	if (typeof chrome != "undefined" && chrome.serial) {
+	if ((typeof chrome != "undefined" && chrome.serial) || window.cordova) {
 		var self = this;
 
 		if (openImmediately != false) {
@@ -40,7 +40,28 @@ SerialPort.prototype.eventListeners = {};
 
 SerialPort.prototype.open = function (callback) {
 	console.log("Opening ", this.comName);
-	chrome.serial.connect(this.comName, {bitrate: parseInt(this.options.baudrate)}, this.proxy('onOpen', callback));
+	if (!window.cordova) {
+		chrome.serial.connect(this.comName, {bitrate: parseInt(this.options.baudrate)}, this.proxy('onOpen', callback));
+	} else {
+		console.log("Connecting to " + this.comName);
+		var self = this;
+		bluetoothSerial.connect(
+			this.comName,
+			function() {
+				console.log("Connected!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+				self.onOpen(callback, {
+					connectionId : "Bluetoothy"
+				})
+			},
+			// this.proxy('onOpen', callback),
+			function(err) { //fail
+				console.log("Failed to connect to bluetooth");
+				console.log(err);
+				this.publishEvent("error", "Could not open bluetooth port.");
+				return;
+			}
+		);
+	}
 };
 
 SerialPort.prototype.onOpen = function (callback, openInfo) {
@@ -58,23 +79,56 @@ SerialPort.prototype.onOpen = function (callback, openInfo) {
 
 	typeof callback == "function" && callback(openInfo);
 
-	chrome.serial.onReceive.addListener(this.proxy('onRead'));
+	if (!window.cordova) {
+		chrome.serial.onReceive.addListener(this.proxy('onRead'));
+	} else {
+		var self = this;
+		var bRead = function() {
+			bluetoothSerial.read(
+				function(data) {
+					if (!data) {
+						process.nextTick(bRead);
+					} else {
+						var readInfo = {
+							connectionId : self.connectionId,
+							data: data
+						}
+						self.onRead(readInfo);
+						console.log("bReading");
+						bRead();
+					}
+				}, function() {
+				this.publishEvent("error", "Could not read from port.");
+			});
+		}
+		bRead();
+	}
 
 };
 
 SerialPort.prototype.onRead = function (readInfo) {
 	if (readInfo && this.connectionId == readInfo.connectionId) {
+		console.log("!!!!yeay data!!!! " + typeof readInfo.data);
 
-		var uint8View = new Uint8Array(readInfo.data);
 		var string = "";
-		for (var i = 0; i < readInfo.data.byteLength; i++) {
-			string += String.fromCharCode(uint8View[i]);
+		var uint8View;
+		if (typeof readInfo.data == "string") {
+			string = readInfo.data;
+			var buff = new Buffer(string);
+			this.publishEvent("data", buff);
+		} else {
+			uint8View = new Uint8Array(readInfo.data);
+			for (var i = 0; i < readInfo.data.byteLength; i++) {
+				string += String.fromCharCode(uint8View[i]);
+			}
+
+			//Maybe this should be a Buffer()
+			this.publishEvent("data", uint8View);
 		}
 
-		//console.log("Got data", string, readInfo.data);
+		console.log("!!!Got data");
 
-		//Maybe this should be a Buffer()
-		this.publishEvent("data", uint8View);
+
 		this.publishEvent("dataString", string);
 	}
 }
@@ -82,12 +136,28 @@ SerialPort.prototype.onRead = function (readInfo) {
 SerialPort.prototype.write = function (buffer, callback) {
 	if (typeof callback != "function") { callback = function() {}; }
 
-	//Make sure its not a browserify faux Buffer.
-	if (buffer instanceof ArrayBuffer == false) {
-		buffer = buffer2ArrayBuffer(buffer);
-	}
+	if (!window.cordova) {
+		//Make sure its not a browserify faux Buffer.
+		if (buffer instanceof ArrayBuffer == false) {
+			buffer = buffer2ArrayBuffer(buffer);
+		}
+		chrome.serial.send(this.connectionId, buffer, callback);
+	} else {
 
-	chrome.serial.send(this.connectionId, buffer, callback);
+		bluetoothSerial.write(
+			buffer.toString(),
+			function() {
+				console.log("Success writing bluetooth: " + buffer.toString());
+				callback(null);
+			},
+			function() {
+				var errString = "Error sending bluetooth data";
+				console.log(errString);
+				this.publishEvent("error", errString);
+				callback(errString);
+			}
+		);
+	}
 };
 
 SerialPort.prototype.writeString = function (string, callback) {
@@ -154,7 +224,8 @@ SerialPort.prototype.proxy = function () {
 }
 
 function SerialPortList(callback) {
-	if (typeof chrome != "undefined" && chrome.serial) {
+	console.log("SerialPortList ")
+	if (typeof chrome != "undefined" && chrome.serial && !window.cordova) {
 		chrome.serial.getDevices(function(ports) {
 			var portObjects = Array(ports.length);
 			for (var i = 0; i < ports.length; i++) {
@@ -162,8 +233,46 @@ function SerialPortList(callback) {
 			}
 			callback(null, portObjects);
 		});
+	} else if (window.cordova) {
+		console.log("Listing");
+		bluetoothSerial.list(
+			function(devices) {
+				console.log("Listed");
+
+				var portObjects = [];
+
+		        devices.forEach(function(device) {
+					var debug = "----- device:";
+
+					var deviceId;
+		            if (device.hasOwnProperty("uuid")) { // TODO https://github.com/don/BluetoothSerial/issues/5
+		                deviceId = device.uuid;
+		            } else if (device.hasOwnProperty("address")) {
+		                deviceId = device.address;
+		            } else {
+		                deviceId = "ERROR " + JSON.stringify(device);
+		            }
+					portObjects.push(new SerialPort(deviceId, null, false));
+
+					debug += deviceId;
+					debug += "  " +  JSON.stringify(device);
+					console.log(debug);
+		        });
+
+		        if (devices.length === 0) {
+					callback(new Error("No bluetooth devices found."));
+		        } else {
+		            app.setStatus("Found " + devices.length + " device" + (devices.length === 1 ? "." : "s."));
+		        }
+			},
+			function() {
+				console.log("error1");
+				callback(new Error("Error getting cordova bluetooth list."));
+			}
+		);
 	} else {
-		callback("No access to serial ports. Try loading as a Chrome Application.", null);
+		console.log("error2");
+		callback(new Error("No access to serial ports. Try loading as a Chrome Application."));
 	}
 };
 
@@ -172,6 +281,7 @@ function str2ab(str) {
 	var buf = new ArrayBuffer(str.length);
 	var bufView = new Uint8Array(buf);
 	for (var i = 0; i < str.length; i++) {
+		console.log(str.charCodeAt(i));
 		bufView[i] = str.charCodeAt(i);
 	}
 	return buf;
