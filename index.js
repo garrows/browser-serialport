@@ -84,7 +84,7 @@ SerialPort.prototype.onOpen = function (callback, openInfo) {
 	} else {
 		var self = this;
 		var bRead = function() {
-			bluetoothSerial.read(
+			bluetoothSerial.readBuffer(
 				function(data) {
 					if (!data) {
 						process.nextTick(bRead);
@@ -94,8 +94,8 @@ SerialPort.prototype.onOpen = function (callback, openInfo) {
 							data: data
 						}
 						self.onRead(readInfo);
-						console.log("bReading");
-						bRead();
+						process.nextTick(bRead);
+						// bRead();
 					}
 				}, function() {
 				this.publishEvent("error", "Could not read from port.");
@@ -108,15 +108,38 @@ SerialPort.prototype.onOpen = function (callback, openInfo) {
 
 SerialPort.prototype.onRead = function (readInfo) {
 	if (readInfo && this.connectionId == readInfo.connectionId) {
-		console.log("!!!!yeay data!!!! " + typeof readInfo.data);
 
 		var string = "";
 		var uint8View;
 		if (typeof readInfo.data == "string") {
 			string = readInfo.data;
-			var buff = new Buffer(string);
+			var buff = new Buffer(string, "utf8");
+			this.publishEvent("data", buff);
+			console.log(
+				"Data " +
+				readInfo.data.length + " " +
+				readInfo.data + " " +
+				readInfo.data.charCodeAt(0) + " " +
+				buff.length + " " +
+				buff.toString('hex')
+			);
+		} else if (readInfo.data instanceof ArrayBuffer) {
+			if (readInfo.data.byteLength == 0) { return; }
+			var buff = arrayBufferToBuffer(readInfo.data);
+			// console.log(
+			// 	"Data3 " +
+			// 	readInfo.data.byteLength + " " +
+			// 	buff.length + " " +
+			// 	buff.toString('hex')
+			// );
 			this.publishEvent("data", buff);
 		} else {
+			console.log(
+				"Data2 " +
+				typeof readInfo.data + " " +
+				readInfo.data.length + " " +
+				readInfo.data + " "
+			);
 			uint8View = new Uint8Array(readInfo.data);
 			for (var i = 0; i < readInfo.data.byteLength; i++) {
 				string += String.fromCharCode(uint8View[i]);
@@ -126,8 +149,6 @@ SerialPort.prototype.onRead = function (readInfo) {
 			this.publishEvent("data", uint8View);
 		}
 
-		console.log("!!!Got data");
-
 
 		this.publishEvent("dataString", string);
 	}
@@ -135,6 +156,7 @@ SerialPort.prototype.onRead = function (readInfo) {
 
 SerialPort.prototype.write = function (buffer, callback) {
 	if (typeof callback != "function") { callback = function() {}; }
+	var self = this;
 
 	if (!window.cordova) {
 		//Make sure its not a browserify faux Buffer.
@@ -144,16 +166,17 @@ SerialPort.prototype.write = function (buffer, callback) {
 		chrome.serial.send(this.connectionId, buffer, callback);
 	} else {
 
-		bluetoothSerial.write(
-			buffer.toString(),
+		bluetoothSerial.writeBuffer(
+			buffer.toString('base64'),
 			function() {
-				console.log("Success writing bluetooth: " + buffer.toString());
+				// console.log("Success writing bluetooth: " + buffer.toString('hex') + " " + buffer.toString('base64'));
 				callback(null);
 			},
-			function() {
+			function(err) {
 				var errString = "Error sending bluetooth data";
+				console.log(err);
 				console.log(errString);
-				this.publishEvent("error", errString);
+				self.publishEvent("error", errString);
 				callback(errString);
 			}
 		);
@@ -295,6 +318,15 @@ function buffer2ArrayBuffer(buffer) {
 		bufView[i] = buffer[i];
 	}
 	return buf;
+}
+
+function arrayBufferToBuffer(ab) {
+    var buffer = new Buffer(ab.byteLength);
+    var view = new Uint8Array(ab);
+    for (var i = 0; i < buffer.length; ++i) {
+        buffer[i] = view[i];
+    }
+    return buffer;
 }
 
 module.exports = {
