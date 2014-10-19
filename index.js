@@ -95,7 +95,7 @@ SerialPort.prototype.writeString = function (string, callback) {
 };
 
 SerialPort.prototype.close = function (callback) {
-	chrome.serial.close(this.connectionId, this.proxy('onClose', callback));
+	chrome.serial.disconnect(this.connectionId, this.proxy('onClose', callback));
 };
 
 SerialPort.prototype.onClose = function (callback) {
