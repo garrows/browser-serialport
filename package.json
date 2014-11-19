@@ -4,8 +4,7 @@
   "description": "Robots in the browser. Just like node-serialport but for browser/chrome apps.",
   "main": "index.js",
   "browser": "./index.js",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -24,6 +23,7 @@
     "robots"
   ],
   "author": "Glen Arrowsmith @garrows",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/garrows/browser-serialport/issues"
   }
