@@ -101,7 +101,7 @@ SerialPort.prototype.onClose = function (callback) {
 	this.connectionId = -1;
 	console.log("Closed port", arguments);
 	this.publishEvent("close");
-	typeof callback == "function" && callback(null, openInfo);
+	typeof callback == "function" && callback(null);
 };
 
 SerialPort.prototype.flush = function (callback) {
