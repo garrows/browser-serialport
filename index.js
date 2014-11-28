@@ -56,7 +56,7 @@ SerialPort.prototype.onOpen = function (callback, openInfo) {
 
 	console.log('Connected to port.', this.connectionId);
 
-	typeof callback == "function" && callback(openInfo);
+	typeof callback == "function" && callback(null, openInfo);
 
 	chrome.serial.onReceive.addListener(this.proxy('onRead'));
 
@@ -102,7 +102,7 @@ SerialPort.prototype.onClose = function (callback) {
 	this.connectionId = -1;
 	console.log("Closed port", arguments);
 	this.publishEvent("close");
-	typeof callback == "function" && callback(openInfo);
+	typeof callback == "function" && callback(null, openInfo);
 };
 
 SerialPort.prototype.flush = function (callback) {
