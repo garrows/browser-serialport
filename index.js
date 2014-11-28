@@ -152,6 +152,14 @@ SerialPort.prototype.proxy = function () {
 	return func;
 }
 
+SerialPort.prototype.set = function (options, callback) {
+	console.log("Setting ", options);
+	chrome.serial.setControlSignals(this.connectionId, options, function(result){
+		if(result) callback();
+		else callback(result);
+	});
+};
+
 function SerialPortList(callback) {
 	if (typeof chrome != "undefined" && chrome.serial) {
 		chrome.serial.getDevices(function(ports) {
