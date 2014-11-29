@@ -73,8 +73,7 @@ SerialPort.prototype.onRead = function (readInfo) {
 
 		//console.log("Got data", string, readInfo.data);
 
-		//Maybe this should be a Buffer()
-		this.publishEvent("data", uint8View);
+		this.publishEvent("data", toBuffer(uint8View));
 		this.publishEvent("dataString", string);
 	}
 }
@@ -185,6 +184,15 @@ function buffer2ArrayBuffer(buffer) {
 		bufView[i] = buffer[i];
 	}
 	return buf;
+}
+
+function toBuffer(ab) {
+	var buffer = new Buffer(ab.byteLength);
+	var view = new Uint8Array(ab);
+	for (var i = 0; i < buffer.length; ++i) {
+	    buffer[i] = view[i];
+	}
+	return buffer;
 }
 
 module.exports = {
