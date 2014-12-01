@@ -121,6 +121,11 @@ SerialPort.prototype.on = function (eventName, callback) {
 	}
 }
 
+SerialPort.prototype.removeListener = function (eventName, callback) {
+
+		this.eventListeners[eventName] = [];
+}
+
 SerialPort.prototype.publishEvent = function (eventName, data) {
 	if (this.eventListeners[eventName] != undefined) {
 		for (var i = 0; i < this.eventListeners[eventName].length; i++) {
