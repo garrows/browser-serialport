@@ -4,15 +4,11 @@ var EE = require('events').EventEmitter;
 var util = require('util');
 
 function SerialPort(path, options, openImmediately) {
-	console.log("SerialPort constructed.");
-
 	this.comName = path;
 
 	if (options) {
 		for (var key in this.options) {
-			//console.log("Looking for " + key + " option.");
 			if (options[key] != undefined) {
-				//console.log("Replacing " + key + " with " + options[key]);
 				this.options[key] = options[key];
 			}
 		}
@@ -42,12 +38,10 @@ SerialPort.prototype.connectionId = -1;
 SerialPort.prototype.comName = "";
 
 SerialPort.prototype.open = function (callback) {
-	console.log("Opening ", this.comName);
-	chrome.serial.connect(this.comName, {bitrate: parseInt(this.options.baudrate)}, this.proxy('onOpen', callback));
+	chrome.serial.connect(this.comName, {bitrate: parseInt(this.options.baudrate, 10)}, this.proxy('onOpen', callback));
 };
 
 SerialPort.prototype.onOpen = function (callback, openInfo) {
-	console.log("onOpen", callback, openInfo);
 	this.connectionId = openInfo.connectionId;
 	if (this.connectionId == -1) {
 		this.emit("error", "Could not open port.");
@@ -56,13 +50,9 @@ SerialPort.prototype.onOpen = function (callback, openInfo) {
 
 	this.emit("open", openInfo);
 
-
-	console.log('Connected to port.', this.connectionId);
-
 	typeof callback == "function" && callback(chrome.runtime.lastError, openInfo);
 
 	chrome.serial.onReceive.addListener(this.proxy('onRead'));
-
 };
 
 SerialPort.prototype.onRead = function (readInfo) {
@@ -73,8 +63,6 @@ SerialPort.prototype.onRead = function (readInfo) {
 		for (var i = 0; i < readInfo.data.byteLength; i++) {
 			string += String.fromCharCode(uint8View[i]);
 		}
-
-		//console.log("Got data", string, readInfo.data);
 
 		this.emit("data", toBuffer(uint8View));
 		this.emit("dataString", string);
@@ -104,7 +92,6 @@ SerialPort.prototype.close = function (callback) {
 
 SerialPort.prototype.onClose = function (callback, result) {
 	this.connectionId = -1;
-	console.log("Closed port", result);
 	this.emit("close");
 	typeof callback == "function" && callback(chrome.runtime.lastError, result);
 };
@@ -138,7 +125,6 @@ SerialPort.prototype.proxy = function () {
 }
 
 SerialPort.prototype.set = function (options, callback) {
-	console.log("Setting ", options);
 	chrome.serial.setControlSignals(this.connectionId, options, function(result){
 		callback(chrome.runtime.lastError, result);
 	});
@@ -156,7 +142,7 @@ function SerialPortList(callback) {
 	} else {
 		callback("No access to serial ports. Try loading as a Chrome Application.", null);
 	}
-};
+}
 
 // Convert string to ArrayBuffer
 function str2ab(str) {
