@@ -59,7 +59,7 @@ SerialPort.prototype.onOpen = function (callback, openInfo) {
 
 	console.log('Connected to port.', this.connectionId);
 
-	typeof callback == "function" && callback(null, openInfo);
+	typeof callback == "function" && callback(chrome.runtime.lastError, openInfo);
 
 	chrome.serial.onReceive.addListener(this.proxy('onRead'));
 
@@ -89,7 +89,9 @@ SerialPort.prototype.write = function (buffer, callback) {
 		buffer = buffer2ArrayBuffer(buffer);
 	}
 
-	chrome.serial.send(this.connectionId, buffer, callback);
+	chrome.serial.send(this.connectionId, buffer, function(info){
+		callback(chrome.runtime.lastError, info);
+	});
 };
 
 SerialPort.prototype.writeString = function (string, callback) {
@@ -100,11 +102,11 @@ SerialPort.prototype.close = function (callback) {
 	chrome.serial.disconnect(this.connectionId, this.proxy('onClose', callback));
 };
 
-SerialPort.prototype.onClose = function (callback) {
+SerialPort.prototype.onClose = function (callback, result) {
 	this.connectionId = -1;
-	console.log("Closed port", arguments);
+	console.log("Closed port", result);
 	this.emit("close");
-	typeof callback == "function" && callback(null);
+	typeof callback == "function" && callback(chrome.runtime.lastError, result);
 };
 
 SerialPort.prototype.flush = function (callback) {
@@ -138,8 +140,7 @@ SerialPort.prototype.proxy = function () {
 SerialPort.prototype.set = function (options, callback) {
 	console.log("Setting ", options);
 	chrome.serial.setControlSignals(this.connectionId, options, function(result){
-		if(result) callback();
-		else callback(result);
+		callback(chrome.runtime.lastError, result);
 	});
 };
 
@@ -150,7 +151,7 @@ function SerialPortList(callback) {
 			for (var i = 0; i < ports.length; i++) {
 				portObjects[i] = new SerialPort(ports[i].path, null, false);
 			}
-			callback(null, portObjects);
+			callback(chrome.runtime.lastError, portObjects);
 		});
 	} else {
 		callback("No access to serial ports. Try loading as a Chrome Application.", null);
