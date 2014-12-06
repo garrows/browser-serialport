@@ -1,5 +1,8 @@
 "use strict";
 
+var EE = require('events').EventEmitter;
+var util = require('util');
+
 function SerialPort(path, options, openImmediately) {
 	console.log("SerialPort constructed.");
 
@@ -27,6 +30,8 @@ function SerialPort(path, options, openImmediately) {
 	}
 }
 
+util.inherits(SerialPort, EE);
+
 SerialPort.prototype.options = {
     baudrate: 57600,
     buffersize: 1
@@ -35,8 +40,6 @@ SerialPort.prototype.options = {
 SerialPort.prototype.connectionId = -1;
 
 SerialPort.prototype.comName = "";
-
-SerialPort.prototype.eventListeners = {};
 
 SerialPort.prototype.open = function (callback) {
 	console.log("Opening ", this.comName);
@@ -47,11 +50,11 @@ SerialPort.prototype.onOpen = function (callback, openInfo) {
 	console.log("onOpen", callback, openInfo);
 	this.connectionId = openInfo.connectionId;
 	if (this.connectionId == -1) {
-		this.publishEvent("error", "Could not open port.");
+		this.emit("error", "Could not open port.");
 		return;
 	}
 
-	this.publishEvent("open", openInfo);
+	this.emit("open", openInfo);
 
 
 	console.log('Connected to port.', this.connectionId);
@@ -73,8 +76,8 @@ SerialPort.prototype.onRead = function (readInfo) {
 
 		//console.log("Got data", string, readInfo.data);
 
-		this.publishEvent("data", toBuffer(uint8View));
-		this.publishEvent("dataString", string);
+		this.emit("data", toBuffer(uint8View));
+		this.emit("dataString", string);
 	}
 }
 
@@ -100,38 +103,13 @@ SerialPort.prototype.close = function (callback) {
 SerialPort.prototype.onClose = function (callback) {
 	this.connectionId = -1;
 	console.log("Closed port", arguments);
-	this.publishEvent("close");
+	this.emit("close");
 	typeof callback == "function" && callback(null);
 };
 
 SerialPort.prototype.flush = function (callback) {
 
 };
-
-//Expecting: data, error
-SerialPort.prototype.on = function (eventName, callback) {
-	if (this.eventListeners[eventName] == undefined) {
-		this.eventListeners[eventName] = [];
-	}
-	if (typeof callback == "function") {
-		this.eventListeners[eventName].push(callback);
-	} else {
-		throw "can not subscribe with a non function callback";
-	}
-}
-
-SerialPort.prototype.removeListener = function (eventName, callback) {
-
-		this.eventListeners[eventName] = [];
-}
-
-SerialPort.prototype.publishEvent = function (eventName, data) {
-	if (this.eventListeners[eventName] != undefined) {
-		for (var i = 0; i < this.eventListeners[eventName].length; i++) {
-			this.eventListeners[eventName][i](data);
-		}
-	}
-}
 
 SerialPort.prototype.proxy = function () {
 	var self = this;
