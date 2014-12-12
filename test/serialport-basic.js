@@ -24,7 +24,7 @@ var hardware = {
   emitData: function(buffer){
     var self = this;
     process.nextTick(function(){
-      var readInfo = {data: buffer, connectionId: 1}
+      var readInfo = {data: MockedSerialPort.buffer2ArrayBuffer(buffer), connectionId: 1}
       self.onReceive(readInfo);
     });
   },

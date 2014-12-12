@@ -141,18 +141,13 @@ SerialPort.prototype.onOpen = function (callback, openInfo) {
 SerialPort.prototype.onRead = function (readInfo) {
 	if (readInfo && this.connectionId == readInfo.connectionId) {
 
-		var uint8View = new Uint8Array(readInfo.data);
-		var string = '';
-		for (var i = 0; i < readInfo.data.byteLength; i++) {
-			string += String.fromCharCode(uint8View[i]);
+		if(this.options.dataCallback){
+			this.options.dataCallback(toBuffer(readInfo.data));
+		}else{
+			this.emit('data', toBuffer(readInfo.data));
+			this.emit('dataString', ab2str(readInfo.data));
 		}
 
-		if(this.options.dataCallback){
-			this.options.dataCallback(toBuffer(uint8View));
-		}else{
-			this.emit('data', toBuffer(uint8View));
-			this.emit('dataString', string);
-		}
 	}
 }
 
@@ -241,6 +236,10 @@ function str2ab(str) {
 	return buf;
 }
 
+function ab2str(buf) {
+  return String.fromCharCode.apply(null, new Uint16Array(buf));
+}
+
 // Convert buffer to ArrayBuffer
 function buffer2ArrayBuffer(buffer) {
 	var buf = new ArrayBuffer(buffer.length);
@@ -263,5 +262,6 @@ function toBuffer(ab) {
 module.exports = {
 	SerialPort: SerialPort,
 	list: SerialPortList,
+	buffer2ArrayBuffer: buffer2ArrayBuffer,
 	used: [] //TODO: Populate this somewhere.
 };
