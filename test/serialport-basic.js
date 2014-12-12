@@ -6,43 +6,80 @@ var expect = chai.expect;
 
 var MockedSerialPort = require('../');
 var SerialPort = MockedSerialPort.SerialPort;
-// var hardware = MockedSerialPort.hardware;
 
-var ports = {
-  '/dev/exists': true
-};
+var options;
+
+var hardware = {
+  ports: {},
+  createPort: function(path){
+    this.ports[path] = true;
+  },
+  reset: function(){
+    this.ports = {};
+    this.onReceive = function(){console.log("onreceive unset");};
+  },
+  onReceive: function(){
+    console.log("onreceive unset");
+  },
+  emitData: function(buffer){
+    var self = this;
+    process.nextTick(function(){
+      var readInfo = {data: buffer, connectionId: 1}
+      self.onReceive(readInfo);
+    });
+  },
+  disconnect: function(path){
+    console.log("disconnect");
+  }
+}
 
 describe('SerialPort', function () {
   var sandbox;
-  var options = {
-    serial: {
-      connect: function(path, options, cb){
-        var port = ports[path];
-        if (!port) {
-          global.chrome.runtime.lastError = new Error(path + " does not exist");
-          return;
-        }
-
-        cb({ connectionId: 1 });
-      },
-      onReceive: {
-        addListener: function(){}
-      },
-      send: function(){},
-      disconnect: function(){}
-    }
-  };
 
   beforeEach(function () {
     sandbox = sinon.sandbox.create();
 
     global.chrome = { runtime: { lastError: null } };
+
+    options = {
+      serial: {
+        connect: function(path, options, cb){
+          if (!hardware.ports[path]) {
+            global.chrome.runtime.lastError = new Error({message: "Failed to connect to the port."});
+          }
+
+          cb({ 
+            bitrate: 9600,
+            bufferSize: 4096,
+            connectionId: 1,
+            ctsFlowControl: true,
+            dataBits: "eight",
+            name: "",
+            parityBit: "no",
+            paused: false,
+            persistent: false,
+            receiveTimeout: 0,
+            sendTimeout: 0,
+            stopBits: "one"
+           });
+        },
+        onReceive: {
+          addListener: function(cb){
+            hardware.onReceive = cb;
+          }
+        },
+        send: function(){},
+        disconnect: function(){}
+      }
+    };
     // Create a port for fun and profit
-    // hardware.reset();
-    // hardware.createPort('/dev/exists');
+    hardware.reset();
+    hardware.createPort('/dev/exists');
   });
 
   afterEach(function () {
+    options = null;
+
     sandbox.restore();
   });
 
@@ -83,10 +120,12 @@ describe('SerialPort', function () {
     });
 
     it('allows optional options', function (done) {
+      global.chrome.serial = options.serial;
       var cb = function () {};
-      var port = new SerialPort('/dev/exists', options, cb);
-      console.log(port);
+      var port = new SerialPort('/dev/exists', cb);
+      // console.log(port);
       expect(typeof port.options).to.eq('object');
+      delete global.chrome.serial;
       done();
     });
 
@@ -96,25 +135,24 @@ describe('SerialPort', function () {
 
     it('emits data events by default', function (done) {
       var testData = new Buffer("I am a really short string");
-      var port = new SerialPort('/dev/exists', function () {
+      var port = new SerialPort('/dev/exists', options, function () {
         port.once('data', function(recvData) {
           expect(recvData).to.eql(testData);
           done();
         });
-        hardware.emitData('/dev/exists', testData);
+        hardware.emitData(testData);
       });
     });
 
     it('calls the dataCallback if set', function (done) {
       var testData = new Buffer("I am a really short string");
-      var opt = {
-        dataCallback: function (recvData) {
+      options.dataCallback = function (recvData) {
           expect(recvData).to.eql(testData);
           done();
         }
-      };
-      var port = new SerialPort('/dev/exists', opt, function () {
-        hardware.emitData('/dev/exists', testData);
+
+      var port = new SerialPort('/dev/exists', options, function () {
+        hardware.emitData(testData);
       });
     });
 
@@ -123,8 +161,8 @@ describe('SerialPort', function () {
   describe('#open', function () {
 
     it('passes the port to the bindings', function (done) {
-      var openSpy = sandbox.spy(MockedSerialPort.SerialPortBinding, 'open');
-      var port = new SerialPort('/dev/exists', {}, false);
+      var openSpy = sandbox.spy(options.serial, 'connect');
+      var port = new SerialPort('/dev/exists', options, false);
       port.open(function (err) {
         expect(err).to.not.be.ok;
         expect(openSpy.calledWith('/dev/exists'));
@@ -133,7 +171,7 @@ describe('SerialPort', function () {
     });
 
     it('calls back an error when opening an invalid port', function (done) {
-      var port = new SerialPort('/dev/unhappy', {}, false);
+      var port = new SerialPort('/dev/unhappy', options, false);
       port.open(function (err) {
         expect(err).to.be.ok;
         done();
@@ -142,14 +180,14 @@ describe('SerialPort', function () {
 
     it("emits data after being reopened", function (done) {
       var data = new Buffer("Howdy!");
-      var port = new SerialPort('/dev/exists', function () {
+      var port = new SerialPort('/dev/exists', options, function () {
         port.close();
         port.open(function () {
           port.once('data', function (res) {
             expect(res).to.eql(data);
             done();
           });
-          hardware.emitData('/dev/exists', data);
+          hardware.emitData(data);
         });
       });
     });
@@ -158,7 +196,7 @@ describe('SerialPort', function () {
 
   describe('close', function () {
     it("fires a close event when it's closed", function (done) {
-      var port = new SerialPort('/dev/exists', function () {
+      var port = new SerialPort('/dev/exists', options, function () {
         var closeSpy = sandbox.spy();
         port.on('close', closeSpy);
         port.close();
@@ -168,7 +206,7 @@ describe('SerialPort', function () {
     });
 
     it("fires a close event after being reopened", function (done) {
-      var port = new SerialPort('/dev/exists', function () {
+      var port = new SerialPort('/dev/exists', options, function () {
         var closeSpy = sandbox.spy();
         port.on('close', closeSpy);
         port.close();
@@ -180,14 +218,13 @@ describe('SerialPort', function () {
     });
   });
 
-  describe('disconnect', function () {
+  describe.skip('disconnect', function () {
     it("fires a disconnect event", function (done) {
-      var port = new SerialPort('/dev/exists', {
-        disconnectedCallback: function (err) {
+      options.disconnectedCallback = function (err) {
           expect(err).to.not.be.ok;
           done();
-        }
-      }, function () {
+        };
+      var port = new SerialPort('/dev/exists', options, function () {
         hardware.disconnect('/dev/exists');
       });
     });
