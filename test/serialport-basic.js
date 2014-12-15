@@ -17,9 +17,13 @@ var hardware = {
   reset: function(){
     this.ports = {};
     this.onReceive = function(){console.log("onreceive unset");};
+    this.onError = function(){console.log("onError unset");};
   },
   onReceive: function(){
     console.log("onreceive unset");
+  },
+  onError: function(){
+    console.log("onError unset");
   },
   emitData: function(buffer){
     var self = this;
@@ -29,7 +33,28 @@ var hardware = {
     });
   },
   disconnect: function(path){
+    this.ports[path] = false;
+    var info = {error: "disconnected", connectionId: 1}
+    this.onError(info);
     console.log("disconnect");
+  },
+  timeout: function(path){
+    this.ports[path] = false;
+    var info = {error: "timeout", connectionId: 1}
+    this.onError(info);
+    console.log("timeout");
+  },
+  loseDevice: function(path){
+    this.ports[path] = false;
+    var info = {error: "device_lost", connectionId: 1}
+    this.onError(info);
+    console.log("loseDevice");
+  },
+  systemError: function(path){
+    this.ports[path] = false;
+    var info = {error: "system_error", connectionId: 1}
+    this.onError(info);
+    console.log("systemError");
   }
 }
 
@@ -68,8 +93,15 @@ describe('SerialPort', function () {
             hardware.onReceive = cb;
           }
         },
+        onError: {
+          addListener: function(cb){
+            hardware.onError = cb;
+          }
+        },
         send: function(){},
-        disconnect: function(){}
+        disconnect: function(){
+          
+        }
       }
     };
     // Create a port for fun and profit
@@ -218,7 +250,7 @@ describe('SerialPort', function () {
     });
   });
 
-  describe.skip('disconnect', function () {
+  describe('disconnect', function () {
     it("fires a disconnect event", function (done) {
       options.disconnectedCallback = function (err) {
           expect(err).to.not.be.ok;

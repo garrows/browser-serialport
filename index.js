@@ -105,6 +105,28 @@ function SerialPort(path, options, openImmediately, callback) {
 		throw 'No access to serial ports. Try loading as a Chrome Application.';
 	}
 
+	this.options.serial.onError.addListener(function(info){
+
+		switch (info.error) {
+
+			case "disconnected":
+			case "device_lost":
+			case "system_error":
+			  // send notification of disconnect
+			  if (self.options.disconnectedCallback) {
+			    self.options.disconnectedCallback(err);
+			  } else {
+			    self.emit("disconnect", err);
+			  }
+			  self.emit("close");
+			  self.removeAllListeners();
+			  break;
+			case "timeout":
+				break;
+		}
+
+	});
+
 	this.options = convertOptions(options);
 	this.path = path;
 
@@ -175,6 +197,9 @@ SerialPort.prototype.close = function (callback) {
 SerialPort.prototype.onClose = function (callback, result) {
 	this.connectionId = -1;
 	this.emit('close');
+
+	this.removeAllListeners();
+
 	typeof callback == 'function' && callback(chrome.runtime.lastError, result);
 };
 
