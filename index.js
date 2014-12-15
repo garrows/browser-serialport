@@ -105,6 +105,8 @@ function SerialPort(path, options, openImmediately, callback) {
 		throw 'No access to serial ports. Try loading as a Chrome Application.';
 	}
 
+	this.options = convertOptions(options);
+
 	this.options.serial.onError.addListener(function(info){
 
 		switch (info.error) {
@@ -126,8 +128,7 @@ function SerialPort(path, options, openImmediately, callback) {
 		}
 
 	});
-
-	this.options = convertOptions(options);
+	
 	this.path = path;
 
 	if (openImmediately) {
