@@ -107,7 +107,7 @@ function SerialPort(path, options, openImmediately, callback) {
 
 	this.options = convertOptions(options);
 
-	this.options.serial.onError.addListener(function(info){
+	this.options.serial.onReceiveError.addListener(function(info){
 
 		switch (info.error) {
 
