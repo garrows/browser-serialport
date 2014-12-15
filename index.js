@@ -46,6 +46,8 @@ function convertOptions(options){
 
 function SerialPort(path, options, openImmediately, callback) {
 
+	EE.call(this);
+
 	var self = this;
 
 	var args = Array.prototype.slice.call(arguments);
