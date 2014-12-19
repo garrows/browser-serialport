@@ -245,7 +245,15 @@ function SerialPortList(callback) {
 		chrome.serial.getDevices(function(ports) {
 			var portObjects = Array(ports.length);
 			for (var i = 0; i < ports.length; i++) {
-				portObjects[i] = new SerialPort(ports[i].path, null, false);
+				portObjects[i] = {
+					comName: ports[i].path,
+					manufacturer: '',
+					serialNumber: '',
+					pnpId: '',
+					locationId: '',
+					vendorId: '',
+					productId: ''
+				};
 			}
 			callback(chrome.runtime.lastError, portObjects);
 		});
