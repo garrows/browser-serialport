@@ -260,7 +260,6 @@ describe('SerialPort', function () {
     it('errors when writing a closed port', function (done) {
       var port = new SerialPort('/dev/exists', options, false);
       port.write(new Buffer(""), function(err){
-        console.log("out");
         expect(err).to.be.ok;
         done();
       });
