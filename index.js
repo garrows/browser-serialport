@@ -6,6 +6,7 @@ var util = require('util');
 var DATABITS = [7, 8];
 var STOPBITS = [1, 2];
 var PARITY = ['none', 'even', 'mark', 'odd', 'space'];
+var FLOWCONTROLS = ["RTSCTS"];
 
 var _options = {
   baudrate: 9600,
@@ -97,6 +98,30 @@ function SerialPort(path, options, openImmediately, callback) {
     return;
   }
 
+  if (options.flowControl || options.flowcontrol) {
+    var fc = options.flowControl || options.flowcontrol;
+
+    if (typeof fc === 'boolean') {
+      options.rtscts = true;
+    } else {
+      fc.forEach(function (flowControl) {
+        var fcup = flowControl.toUpperCase();
+        var idx = FLOWCONTROLS.indexOf(fcup);
+        if (idx < 0) {
+          var err = new Error('Invalid "flowControl": ' + fcup + ". Valid options: " + FLOWCONTROLS.join(", "));
+          callback(err);
+          return;
+        } else {
+
+          // "XON", "XOFF", "XANY", "DTRDTS", "RTSCTS"
+          switch (idx) {
+            case 0: options.rtscts = true; break;
+          }
+        }
+      });
+    }
+  }
+
   options.bufferSize = options.bufferSize || options.buffersize || _options.buffersize;
 
   // defaults to chrome.serial if no options.serial passed
@@ -116,6 +141,7 @@ function SerialPort(path, options, openImmediately, callback) {
       case "disconnected":
       case "device_lost":
       case "system_error":
+        err = new Error("Disconnected");
         // send notification of disconnect
         if (self.options.disconnectedCallback) {
           self.options.disconnectedCallback(err);
@@ -145,7 +171,15 @@ util.inherits(SerialPort, EE);
 SerialPort.prototype.connectionId = -1;
 
 SerialPort.prototype.open = function (callback) {
-  this.options.serial.connect(this.path, {bitrate: parseInt(this.options.baudrate, 10)}, this.proxy('onOpen', callback));
+  var options = {
+    bitrate: parseInt(this.options.baudrate, 10),
+    dataBits: this.options.databits,
+    parityBit: this.options.parity,
+    stopBits: this.options.stopbits,
+    ctsFlowControl: this.options.rtscts
+  };
+
+  this.options.serial.connect(this.path, options, this.proxy('onOpen', callback));
 };
 
 SerialPort.prototype.onOpen = function (callback, openInfo) {
@@ -179,6 +213,8 @@ SerialPort.prototype.onRead = function (readInfo) {
 SerialPort.prototype.write = function (buffer, callback) {
   if (typeof callback != 'function') { callback = function() {}; }
 
+  if ( this.connectionId<0 ) { return callback(new Error("Serialport not open.")); }
+
   //Make sure its not a browserify faux Buffer.
   if (buffer instanceof ArrayBuffer == false) {
     buffer = buffer2ArrayBuffer(buffer);
@@ -194,6 +230,8 @@ SerialPort.prototype.writeString = function (string, callback) {
 };
 
 SerialPort.prototype.close = function (callback) {
+  if ( this.connectionId<0 ) { return callback(new Error("Serialport not open.")); }
+
   this.options.serial.disconnect(this.connectionId, this.proxy('onClose', callback));
 };
 
@@ -207,8 +245,28 @@ SerialPort.prototype.onClose = function (callback, result) {
 };
 
 SerialPort.prototype.flush = function (callback) {
+  if ( this.connectionId<0 ) { return callback(new Error("Serialport not open.")); }
 
+  this.options.serial.flush(this.connectionId, function(err){
+    if (err) {
+      if (callback) {
+        callback(err, result);
+      } else {
+        self.emit('error', err);
+      }
+    } else {
+      callback(err, result);
+    }
+  });
+  
 };
+
+SerialPort.prototype.drain = function (callback) {
+  if ( this.connectionId<0 ) { return callback(new Error("Serialport not open.")); }
+
+  callback();
+};
+
 
 SerialPort.prototype.proxy = function () {
   var self = this;
