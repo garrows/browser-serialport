@@ -98,7 +98,9 @@ describe('SerialPort', function () {
             hardware.onReceiveError = cb;
           }
         },
-        send: function(){},
+        send: function(connectionId, buffer, cb){
+
+        },
         disconnect: function(){
           
         }
@@ -149,6 +151,33 @@ describe('SerialPort', function () {
       };
 
       var port = new SerialPort('/dev/exists', { databits : 19 }, false, errorCallback);
+    });
+
+    it('errors with invalid stopbits', function (done) {
+      var errorCallback = function (err) {
+        chai.assert.isDefined(err, 'err is not defined');
+        done();
+      };
+
+      var port = new SerialPort('/dev/exists', { stopBits : 19 }, false, errorCallback);
+    });
+
+    it('errors with invalid parity', function (done) {
+      var errorCallback = function (err) {
+        chai.assert.isDefined(err, 'err is not defined');
+        done();
+      };
+
+      var port = new SerialPort('/dev/exists', { parity : 'something' }, false, errorCallback);
+    });
+
+    it('errors with invalid path', function (done) {
+      var errorCallback = function (err) {
+        chai.assert.isDefined(err, 'err is not defined');
+        done();
+      };
+
+      var port = new SerialPort(null, false, errorCallback);
     });
 
     it('allows optional options', function (done) {
@@ -226,6 +255,20 @@ describe('SerialPort', function () {
 
   });
 
+  describe('#send', function () {
+
+    it('errors when writing a closed port', function (done) {
+      var port = new SerialPort('/dev/exists', options, false);
+      port.write(new Buffer(""), function(err){
+        console.log("out");
+        expect(err).to.be.ok;
+        done();
+      });
+    });
+
+
+  });
+
   describe('close', function () {
     it("fires a close event when it's closed", function (done) {
       var port = new SerialPort('/dev/exists', options, function () {
@@ -248,12 +291,20 @@ describe('SerialPort', function () {
         done();
       });
     });
+
+    it("errors when closing an invalid port", function (done) {
+      var port = new SerialPort('/dev/exists', options, false);
+      port.close(function(err){
+        expect(err).to.be.ok;
+        done();
+      });
+    });
   });
 
   describe('disconnect', function () {
     it("fires a disconnect event", function (done) {
       options.disconnectedCallback = function (err) {
-          expect(err).to.not.be.ok;
+          expect(err).to.be.ok;
           done();
         };
       var port = new SerialPort('/dev/exists', options, function () {
