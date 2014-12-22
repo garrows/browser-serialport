@@ -62,10 +62,6 @@ sp.on("data", function(buf) {
   console.log("Data", buf);
 }); 
 
-//Or string encoding can be done for you
-sp.on("dataString", function(string) {
-  console.log("String", string);
-}); 
 
 
 ```
