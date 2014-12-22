@@ -205,7 +205,6 @@ SerialPort.prototype.onRead = function (readInfo) {
       this.options.dataCallback(toBuffer(readInfo.data));
     }else{
       this.emit('data', toBuffer(readInfo.data));
-      this.emit('dataString', ab2str(readInfo.data));
     }
 
   }
@@ -329,10 +328,6 @@ function str2ab(str) {
     bufView[i] = str.charCodeAt(i);
   }
   return buf;
-}
-
-function ab2str(buf) {
-  return String.fromCharCode.apply(null, new Uint16Array(buf));
 }
 
 // Convert buffer to ArrayBuffer

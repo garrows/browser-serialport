@@ -53,12 +53,8 @@ function connect(port, baudrate) {
 		output.textContent += "\nError: " + string + "\n";
 	});
 
-	// sp.on("data", function(data) {
-	// 	//console.log("Data", data);
-	// });
-
-	sp.on("dataString", function(string) {
-		output.textContent += string;
+	sp.on("data", function(data) {
+		output.textContent += data.toString();
 	});
 
 	function send() {
