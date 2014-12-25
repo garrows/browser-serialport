@@ -215,6 +215,10 @@ SerialPort.prototype.write = function (buffer, callback) {
 
   if ( this.connectionId<0 ) { return callback(new Error("Serialport not open.")); }
 
+  if(typeof buffer  === 'string'){
+    buffer = str2ab(buffer);
+  }
+
   //Make sure its not a browserify faux Buffer.
   if (buffer instanceof ArrayBuffer == false) {
     buffer = buffer2ArrayBuffer(buffer);
@@ -225,9 +229,6 @@ SerialPort.prototype.write = function (buffer, callback) {
   });
 };
 
-SerialPort.prototype.writeString = function (string, callback) {
-  this.write(str2ab(string), callback);
-};
 
 SerialPort.prototype.close = function (callback) {
   if ( this.connectionId<0 ) { return callback(new Error("Serialport not open.")); }
