@@ -148,7 +148,7 @@ function SerialPort(path, options, openImmediately, callback) {
         } else {
           self.emit("disconnect", err);
         }
-        this.connectionId = -1;
+        self.connectionId = -1;
         self.emit("close");
         self.removeAllListeners();
         break;
