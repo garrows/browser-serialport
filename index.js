@@ -306,12 +306,12 @@ function SerialPortList(callback) {
       for (var i = 0; i < ports.length; i++) {
         portObjects[i] = {
           comName: ports[i].path,
-          manufacturer: '',
+          manufacturer: ports[i].displayName,
           serialNumber: '',
           pnpId: '',
-          locationId: '',
-          vendorId: '',
-          productId: ''
+          locationId:'',
+          vendorId: "0x" + (ports[i].vendorId||0).toString(16),
+          productId: "0x" + (ports[i].productId||0).toString(16)
         };
       }
       callback(chrome.runtime.lastError, portObjects);
