@@ -171,7 +171,7 @@ function SerialPortList(callback) {
 	function compat(deviceInfo){
 		return {
 			comName: deviceInfo.path,
-			manufacturer: deviceInfo.vendorId,
+			manufacturer: deviceInfo.displayName,
 			serialNumber: undefined,
 			pnpId: undefined,
 			vendorId: "0x" + (deviceInfo.vendorId||0).toString(16),
