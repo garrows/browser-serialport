@@ -156,15 +156,29 @@ SerialPort.prototype.proxy = function () {
 function SerialPortList(callback) {
 	if (typeof chrome != "undefined" && chrome.serial) {
 		chrome.serial.getDevices(function(ports) {
-			var portObjects = Array(ports.length);
-			for (var i = 0; i < ports.length; i++) {
-				portObjects[i] = new SerialPort(ports[i].path, null, false);
+  
+			var list = [];
+			for(var i=0;i<ports.length;++i){
+				list.push(compat(ports[i]));
 			}
-			callback(null, portObjects);
+			callback(null, list);
+
 		});
 	} else {
 		callback("No access to serial ports. Try loading as a Chrome Application.", null);
 	}
+
+	function compat(deviceInfo){
+		return {
+			comName: deviceInfo.path,
+			manufacturer: deviceInfo.displayName,
+			serialNumber: undefined,
+			pnpId: undefined,
+			vendorId: "0x" + (deviceInfo.vendorId||0).toString(16),
+			productId: "0x" + (deviceInfo.productId||0).toString(16)
+		};
+	}
+
 };
 
 // Convert string to ArrayBuffer
