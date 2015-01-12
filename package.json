@@ -1,20 +1,25 @@
 {
-  "name": "browser-serialport",
-  "version": "1.0.6",
-  "description": "Robots in the browser. Just like node-serialport but for browser/chrome apps.",
+  "name": "chrome-serialport",
+  "version": "2.3.0",
+  "description": "Fork of @garrows browser-serialport with full serialport compatibility.",
   "main": "index.js",
-  "browser": "./index.js",
   "dependencies": {},
-  "devDependencies": {},
+  "devDependencies": {
+    "mocha": "*",
+    "chai": "*",
+    "sinon-chai": "*",
+    "sinon": "*"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/garrows/browser-serialport"
+    "url": "git://github.com/jacobrosenthal/browser-serialport"
   },
   "keywords": [
     "serial",
+    "serialport",
     "firmata",
     "nodebots",
     "chromebots",
@@ -22,9 +27,9 @@
     "robot",
     "robots"
   ],
-  "author": "Glen Arrowsmith @garrows",
+  "author": "Jacob Rosenthal @jacobrosenthal",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/garrows/browser-serialport/issues"
+    "url": "https://github.com/jacobrosenthal/browser-serialport/issues"
   }
 }

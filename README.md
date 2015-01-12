@@ -45,27 +45,23 @@ var sp = new SerialPort(port, {
 
 
 sp.on("open", function() {
-	console.log("Connection is ready.");
-	//Send a string
-	sp.writeString("Hello robot\n");
-	//You can also send buffers
-	var buf = new Buffer("Buffers are handy", "utf8");
-	sp.write(buf);
+  console.log("Connection is ready.");
+  //Send a string
+  sp.writeString("Hello robot\n");
+  //You can also send buffers
+  var buf = new Buffer("Buffers are handy", "utf8");
+  sp.write(buf);
 });
 
 sp.on("error", function(err) {
-	console.log("Error", err);
+  console.log("Error", err);
 });
 
 //You can listen for data as a buffer.
 sp.on("data", function(buf) {
-	console.log("Data", buf);
-});	
+  console.log("Data", buf);
+}); 
 
-//Or string encoding can be done for you
-sp.on("dataString", function(string) {
-	console.log("String", string);
-});	
 
 
 ```
@@ -73,13 +69,13 @@ sp.on("dataString", function(string) {
 You can also list the available serialports.
 
 ```js
-	
+  
 var SerialPortLib = require("browser-serialport");
 
 SerialPortLib.list(function(error, portsArray) {
-	if (!error) {
-		console.log("Ports available", portsArray);
-	}
+  if (!error) {
+    console.log("Ports available", portsArray);
+  }
 });
 
 ```
