@@ -42,16 +42,24 @@ When opening a serial port, you can specify (in this order).
 
 The options object allows you to pass named options to the serial port during initialization. The valid attributes for the options object are the following:
 
-* baudrate: Baud Rate, defaults to 9600. Should be one of: 115200, 57600, 38400, 19200, 14400, 9600, 4800, 2400, ~~1800~~, 1200, ~~600~~, 300, ~~200~~, ~~150~~, ~~134~~, 110, ~~75~~, or ~~50~~. ~Custom rates as allowed by hardware is supported.~
+* baudrate: Baud Rate, defaults to 9600. Should be one of: 115200, 57600, 38400, 19200, 9600, 4800, 2400, 1800, 1200, 600, 300, 200, 150, 134, 110, 75, or 50. Custom rates as allowed by hardware is supported.
 * databits: Data Bits, defaults to 8. Must be one of: 8, 7, ~~6~~, or ~~5~~.
 * stopbits: Stop Bits, defaults to 1. Must be one of: 1 or 2.
 * parity: Parity, defaults to 'none'. Must be one of: 'none', 'even', 'mark', 'odd', 'space'
 * buffersize: Size of read buffer, defaults to 255. Must be an integer value.
-* ~~parser: The parser engine to use with read data, defaults to rawPacket strategy which just emits the raw buffer as a "data" event. Can be any function that accepts EventEmitter as first parameter and the raw buffer as the second parameter.~~
+* parser: The parser engine to use with read data, defaults to rawPacket strategy which just emits the raw buffer as a "data" event. Can be any function that accepts EventEmitter as first parameter and the raw buffer as the second parameter.
 
 **Note, we have added support for either all lowercase OR camelcase of the options (thanks @jagautier), use whichever style you prefer.**
 
-**Some node-serialport options are not available on chrome, those not supported have beeen struck through above.**
+Known incompatibilities with node-serialport
+-------------------------------------------
+* Parsers not implemented
+* Inconsistent error messages and triggers
+* Chrome has a slightly different options set:
+* dataBits: 7, 8
+* stopBits: 1, 2
+* parity: 'none', 'even', 'mark', 'odd', 'space'
+* flowControl: 'RTSCTS'
 
 
 open event
