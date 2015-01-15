@@ -17,6 +17,18 @@ If you want help making your first Chrome App, read the ["Create Your First App"
 
 There is currently no Firefox extension support but that might come soon if possible.
 
+
+Known incompatibilities with node-serialport
+-------------------------------------------
+* Parsers not implemented
+* Inconsistent error messages and triggers
+* Chrome has a slightly different options set:
+* dataBits: 7, 8
+* stopBits: 1, 2
+* parity: 'none', 'even', 'mark', 'odd', 'space'
+* flowControl: 'RTSCTS'
+
+
 ## Installation
 
 ```
@@ -50,17 +62,6 @@ The options object allows you to pass named options to the serial port during in
 * parser: The parser engine to use with read data, defaults to rawPacket strategy which just emits the raw buffer as a "data" event. Can be any function that accepts EventEmitter as first parameter and the raw buffer as the second parameter.
 
 **Note, we have added support for either all lowercase OR camelcase of the options (thanks @jagautier), use whichever style you prefer.**
-
-Known incompatibilities with node-serialport
--------------------------------------------
-* Parsers not implemented
-* Inconsistent error messages and triggers
-* Chrome has a slightly different options set:
-* dataBits: 7, 8
-* stopBits: 1, 2
-* parity: 'none', 'even', 'mark', 'odd', 'space'
-* flowControl: 'RTSCTS'
-
 
 open event
 ----------
