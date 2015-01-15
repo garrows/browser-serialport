@@ -187,7 +187,7 @@ SerialPort.prototype.onOpen = function (callback, openInfo) {
 
   this.connectionId = openInfo.connectionId;
   if (this.connectionId == -1) {
-    this.emit('error', 'Could not open port.');
+    this.emit('error', new Error('Could not open port.'));
     return;
   }
 
