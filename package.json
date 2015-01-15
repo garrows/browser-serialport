@@ -6,11 +6,10 @@
   "browser": "./index.js",
   "dependencies": {},
   "devDependencies": {
-    "mocha": "*",
-    "chai": "*",
-    "sinon-chai": "*",
-    "sinon": "*",
-    "serialport": "^1.4.6"
+    "chai": "^1.10.0",
+    "mocha": "^2.1.0",
+    "sinon": "^1.12.2",
+    "sinon-chai": "^2.6.0"
   },
   "scripts": {
     "test": "mocha"
