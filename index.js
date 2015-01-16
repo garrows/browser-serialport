@@ -129,7 +129,7 @@ function SerialPort(path, options, openImmediately, callback) {
   options.serial = options.serial || (typeof chrome !== 'undefined' && chrome.serial);
 
   if (!options.serial) {
-    throw 'No access to serial ports. Try loading as a Chrome Application.';
+    throw new Error('No access to serial ports. Try loading as a Chrome Application.');
   }
 
   this.options = convertOptions(options);
@@ -157,7 +157,7 @@ function SerialPort(path, options, openImmediately, callback) {
     }
 
   });
-  
+
   this.path = path;
 
   if (openImmediately) {
@@ -224,7 +224,7 @@ SerialPort.prototype.write = function (buffer, callback) {
     buffer = buffer2ArrayBuffer(buffer);
   }
 
-  this.options.serial.send(this.connectionId, buffer, function(info){  
+  this.options.serial.send(this.connectionId, buffer, function(info){
     callback(chrome.runtime.lastError, info);
   });
 };
@@ -259,7 +259,7 @@ SerialPort.prototype.flush = function (callback) {
       callback(err, result);
     }
   });
-  
+
 };
 
 SerialPort.prototype.drain = function (callback) {
