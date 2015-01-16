@@ -1,15 +1,15 @@
 # browser-serialport
 
-Robots in the browser. Just like [node-serialport](https://npmjs.org/package/serialport) but for browser apps. 
+Robots in the browser. Just like [node-serialport](https://npmjs.org/package/serialport) but for browser apps.
 
 
 ## Why not Node.js?
 
-[Nodebots](http://nodebots.io/) are awesome but HTML5 apps have access to a lot of APIs that make sense for robotics like the [GamepadAPI](http://www.html5rocks.com/en/tutorials/doodles/gamepad/), [WebRTC Video and Data](http://www.webrtc.org/), [Web Speech API](http://www.google.com/intl/en/chrome/demos/speech.html), etc. Also you get a nice GUI and its easier to run. I have also made a fork of [Johnny-Five](https://github.com/garrows/johnny-five) to work with [Browserify](http://browserify.org/) as well by modifying it's dependancy [Firmata](https://github.com/garrows/firmata) to use browser-serialport. 
+[Nodebots](http://nodebots.io/) are awesome but HTML5 apps have access to a lot of APIs that make sense for robotics like the [GamepadAPI](http://www.html5rocks.com/en/tutorials/doodles/gamepad/), [WebRTC Video and Data](http://www.webrtc.org/), [Web Speech API](http://www.google.com/intl/en/chrome/demos/speech.html), etc. Also you get a nice GUI and its easier to run. I have also made a fork of [Johnny-Five](https://github.com/garrows/johnny-five) to work with [Browserify](http://browserify.org/) as well by modifying it's dependancy [Firmata](https://github.com/garrows/firmata) to use browser-serialport.
 
 ## Restrictions
 
-You will not be able to add this to your normal website. 
+You will not be able to add this to your normal website.
 
 This library only works in a [Chrome Packaged App](http://developer.chrome.com/apps/about_apps.html) as this is the only way to get access to the [serial ports API](http://developer.chrome.com/apps/serial.html) in the browser.
 
@@ -21,12 +21,12 @@ There is currently no Firefox extension support but that might come soon if poss
 Known incompatibilities with node-serialport
 -------------------------------------------
 * Parsers not implemented
-* Inconsistent error messages and triggers
+* Inconsistent error messages
 * Chrome has a slightly different options set:
-* dataBits: 7, 8
-* stopBits: 1, 2
-* parity: 'none', 'even', 'mark', 'odd', 'space'
-* flowControl: 'RTSCTS'
+    * __dataBits__: 7, 8
+    * __stopBits__: 1, 2
+    * __parity__: 'none', 'even', 'mark', 'odd', 'space'
+    * __flowControl__: 'RTSCTS'
 
 
 ## Installation
