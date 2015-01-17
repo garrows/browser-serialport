@@ -317,7 +317,7 @@ function SerialPortList(callback) {
       callback(chrome.runtime.lastError, portObjects);
     });
   } else {
-    callback('No access to serial ports. Try loading as a Chrome Application.', null);
+    callback(new Error('No access to serial ports. Try loading as a Chrome Application.'), null);
   }
 }
 
