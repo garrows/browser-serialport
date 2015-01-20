@@ -184,6 +184,15 @@ SerialPort.prototype.open = function (callback) {
 };
 
 SerialPort.prototype.onOpen = function (callback, openInfo) {
+  if(chrome.runtime.lastError){
+    if(typeof callback === 'function'){
+      callback(chrome.runtime.lastError);
+    }else{
+      this.emit('error', chrome.runtime.lastError);
+    }
+    return;
+  }
+
   this.connectionId = openInfo.connectionId;
 
   if (this.connectionId === -1) {
@@ -214,7 +223,13 @@ SerialPort.prototype.onRead = function (readInfo) {
 
 SerialPort.prototype.write = function (buffer, callback) {
   if (this.connectionId < 0) {
-    return callback(new Error('Serialport not open.'));
+    var err = new Error('Serialport not open.');
+    if(typeof callback === 'function'){
+      callback(err);
+    }else{
+      this.emit('error', err);
+    }
+    return;
   }
 
   if (typeof buffer === 'string') {
@@ -279,6 +294,7 @@ SerialPort.prototype.flush = function (callback) {
       } else {
         self.emit('error', err);
       }
+      return;
     } else {
       callback(err, result);
     }
