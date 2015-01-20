@@ -260,13 +260,14 @@ SerialPort.prototype.flush = function (callback) {
     return callback(new Error('Serialport not open.'));
   }
 
-  this.options.serial.flush(this.connectionId, function(err, result) {
-    if (err) {
-      if (callback) {
+  this.options.serial.flush(this.connectionId, function(result) {
+    if (chrome.runtime.lastError) {
+      if (typeof callback === 'function') {
         callback(err, result);
       } else {
         self.emit('error', err);
       }
+      return;
     } else {
       callback(err, result);
     }
