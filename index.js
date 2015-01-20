@@ -263,13 +263,13 @@ SerialPort.prototype.flush = function (callback) {
   this.options.serial.flush(this.connectionId, function(result) {
     if (chrome.runtime.lastError) {
       if (typeof callback === 'function') {
-        callback(err, result);
+        callback(chrome.runtime.lastError, result);
       } else {
-        self.emit('error', err);
+        self.emit('error', chrome.runtime.lastError);
       }
       return;
     } else {
-      callback(err, result);
+      callback(null, result);
     }
   });
 };
