@@ -98,27 +98,33 @@ function SerialPort(path, options, openImmediately, callback) {
     return;
   }
 
+  options.rtscts = _options.rtscts;
+
   if (options.flowControl || options.flowcontrol) {
     var fc = options.flowControl || options.flowcontrol;
 
     if (typeof fc === 'boolean') {
       options.rtscts = true;
     } else {
-      fc.forEach(function (flowControl) {
+      var clean = fc.every(function (flowControl) {
         var fcup = flowControl.toUpperCase();
         var idx = FLOWCONTROLS.indexOf(fcup);
         if (idx < 0) {
-          var err = new Error('Invalid "flowControl": ' + fcup + ". Valid options: " + FLOWCONTROLS.join(", "));
+          var err = new Error('Invalid "flowControl": ' + fcup + '. Valid options: ' + FLOWCONTROLS.join(', '));
           callback(err);
-          return;
+          return false;
         } else {
 
           // "XON", "XOFF", "XANY", "DTRDTS", "RTSCTS"
           switch (idx) {
             case 0: options.rtscts = true; break;
           }
+          return true;
         }
       });
+      if(!clean){
+        return;
+      }
     }
   }
 
