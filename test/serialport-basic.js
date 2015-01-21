@@ -101,8 +101,11 @@ describe('SerialPort', function () {
         send: function(connectionId, buffer, cb){
 
         },
-        disconnect: function(){
-          
+        disconnect: function(connectionId, cb){
+          cb();
+        },
+        setControlSignals: function(connectionId, options, cb){
+          cb();
         }
       }
     };
@@ -121,6 +124,13 @@ describe('SerialPort', function () {
     it("opens the port immediately", function (done) {
       var port = new SerialPort('/dev/exists', options, function (err) {
         expect(err).to.not.be.ok;
+        done();
+      });
+    });
+
+    it('emits the open event', function (done) {
+      var port = new SerialPort('/dev/exists', options);
+      port.on('open', function(){
         done();
       });
     });
@@ -159,7 +169,7 @@ describe('SerialPort', function () {
         done();
       };
 
-      var port = new SerialPort('/dev/exists', { stopBits : 19 }, false, errorCallback);
+      var port = new SerialPort('/dev/exists', { stopbits : 19 }, false, errorCallback);
     });
 
     it('errors with invalid parity', function (done) {
@@ -168,7 +178,16 @@ describe('SerialPort', function () {
         done();
       };
 
-      var port = new SerialPort('/dev/exists', { parity : 'something' }, false, errorCallback);
+      var port = new SerialPort('/dev/exists', { parity : 'pumpkins' }, false, errorCallback);
+    });
+
+    it('errors with invalid flow control', function (done) {
+      var errorCallback = function (err) {
+        chai.assert.isDefined(err, 'err is not defined');
+        done();
+      };
+
+      var port = new SerialPort('/dev/exists', { flowcontrol : ['pumpkins'] }, false, errorCallback);
     });
 
     it('errors with invalid path', function (done) {
@@ -188,6 +207,55 @@ describe('SerialPort', function () {
       expect(typeof port.options).to.eq('object');
       delete global.chrome.serial;
       done();
+    });
+
+  });
+
+  describe('Functions', function () {
+
+    it('write errors when serialport not open', function (done) {
+      var cb = function () {};
+      var port = new SerialPort('/dev/exists', options, false, cb);
+      port.write(null, function(err){
+        chai.assert.isDefined(err, 'err is not defined');
+        done();
+      });
+    });
+
+    it('close errors when serialport not open', function (done) {
+      var cb = function () {};
+      var port = new SerialPort('/dev/exists', options, false, cb);
+      port.close(function(err){
+        chai.assert.isDefined(err, 'err is not defined');
+        done();
+      });
+    });
+
+    it('flush errors when serialport not open', function (done) {
+      var cb = function () {};
+      var port = new SerialPort('/dev/exists', options, false, cb);
+      port.flush(function(err){
+        chai.assert.isDefined(err, 'err is not defined');
+        done();
+      });
+    });
+
+    it('set errors when serialport not open', function (done) {
+      var cb = function () {};
+      var port = new SerialPort('/dev/exists', options, false, cb);
+      port.set({}, function(err){
+        chai.assert.isDefined(err, 'err is not defined');
+        done();
+      });
+    });
+
+    it('drain errors when serialport not open', function (done) {
+      var cb = function () {};
+      var port = new SerialPort('/dev/exists', options, false, cb);
+      port.drain(function(err){
+        chai.assert.isDefined(err, 'err is not defined');
+        done();
+      });
     });
 
   });
@@ -298,6 +366,15 @@ describe('SerialPort', function () {
         done();
       });
     });
+
+    it('emits a close event', function (done) {
+      var port = new SerialPort('/dev/exists', options, function () {
+        port.on('close', function () {
+          done();
+        });
+        port.close();
+      });
+    });
   });
 
   describe('disconnect', function () {
@@ -307,6 +384,15 @@ describe('SerialPort', function () {
           done();
         };
       var port = new SerialPort('/dev/exists', options, function () {
+        hardware.disconnect('/dev/exists');
+      });
+    });
+
+    it('emits a disconnect event', function (done) {
+      var port = new SerialPort('/dev/exists', options, function () {
+        port.on('disconnect', function () {
+          done();
+        });
         hardware.disconnect('/dev/exists');
       });
     });
