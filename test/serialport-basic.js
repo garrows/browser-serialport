@@ -125,6 +125,13 @@ describe('SerialPort', function () {
       });
     });
 
+    it('emits the open event', function (done) {
+      var port = new SerialPort('/dev/exists', options);
+      port.on('open', function(){
+        done();
+      });
+    });
+
     it.skip('emits an error on the factory when erroring without a callback', function (done) {
       // finish the test on error
       MockedSerialPort.once('error', function (err) {
