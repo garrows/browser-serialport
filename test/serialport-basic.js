@@ -101,8 +101,8 @@ describe('SerialPort', function () {
         send: function(connectionId, buffer, cb){
 
         },
-        disconnect: function(){
-          
+        disconnect: function(connectionId, cb){
+          cb();
         },
         setControlSignals: function(connectionId, options, cb){
           cb();
