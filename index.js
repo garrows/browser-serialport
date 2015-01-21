@@ -122,7 +122,6 @@ function SerialPort(path, options, openImmediately, callback) {
           return true;
         }
       });
-      console.log(clean);
       if(!clean){
         return;
       }
