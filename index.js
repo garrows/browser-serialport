@@ -184,6 +184,14 @@ SerialPort.prototype.open = function (callback) {
 };
 
 SerialPort.prototype.onOpen = function (callback, openInfo) {
+  if(chrome.runtime.lastError){
+    if(typeof callback === 'function'){
+      callback(chrome.runtime.lastError);
+    }else{
+      this.emit('error', chrome.runtime.lastError);
+    }
+  }
+
   this.connectionId = openInfo.connectionId;
 
   if (this.connectionId === -1) {
@@ -194,7 +202,7 @@ SerialPort.prototype.onOpen = function (callback, openInfo) {
   this.emit('open', openInfo);
 
   if(typeof callback === 'function'){
-    callback(chrome.runtime.lastError, openInfo);
+    callback(null, openInfo);
   }
 
   this.options.serial.onReceive.addListener(this.proxy('onRead'));
