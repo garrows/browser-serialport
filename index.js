@@ -184,6 +184,15 @@ SerialPort.prototype.open = function (callback) {
 };
 
 SerialPort.prototype.onOpen = function (callback, openInfo) {
+  if(chrome.runtime.lastError){
+    if(typeof callback === 'function'){
+      callback(chrome.runtime.lastError);
+    }else{
+      this.emit('error', chrome.runtime.lastError);
+    }
+    return;
+  }
+
   this.connectionId = openInfo.connectionId;
 
   if (this.connectionId === -1) {
@@ -214,7 +223,13 @@ SerialPort.prototype.onRead = function (readInfo) {
 
 SerialPort.prototype.write = function (buffer, callback) {
   if (this.connectionId < 0) {
-    return callback(new Error('Serialport not open.'));
+    var err = new Error('Serialport not open.');
+    if(typeof callback === 'function'){
+      callback(err);
+    }else{
+      this.emit('error', err);
+    }
+    return;
   }
 
   if (typeof buffer === 'string') {
@@ -236,7 +251,13 @@ SerialPort.prototype.write = function (buffer, callback) {
 
 SerialPort.prototype.close = function (callback) {
   if (this.connectionId < 0) {
-    return callback(new Error('Serialport not open.'));
+    var err = new Error('Serialport not open.');
+    if(typeof callback === 'function'){
+      callback(err);
+    }else{
+      this.emit('error', err);
+    }
+    return;
   }
 
   this.options.serial.disconnect(this.connectionId, this.proxy('onClose', callback));
@@ -254,19 +275,26 @@ SerialPort.prototype.onClose = function (callback, result) {
 };
 
 SerialPort.prototype.flush = function (callback) {
-  var self = this;
-
   if (this.connectionId < 0) {
-    return callback(new Error('Serialport not open.'));
+    var err = new Error('Serialport not open.');
+    if(typeof callback === 'function'){
+      callback(err);
+    }else{
+      this.emit('error', err);
+    }
+    return;
   }
+
+  var self = this;
 
   this.options.serial.flush(this.connectionId, function(err, result) {
     if (err) {
-      if (callback) {
+      if(typeof callback === 'function') {
         callback(err, result);
       } else {
         self.emit('error', err);
       }
+      return;
     } else {
       callback(err, result);
     }
@@ -275,7 +303,13 @@ SerialPort.prototype.flush = function (callback) {
 
 SerialPort.prototype.drain = function (callback) {
   if (this.connectionId < 0) {
-    return callback(new Error('Serialport not open.'));
+    var err = new Error('Serialport not open.');
+    if(typeof callback === 'function'){
+      callback(err);
+    }else{
+      this.emit('error', err);
+    }
+    return;
   }
 
   if (typeof callback === 'function') {
