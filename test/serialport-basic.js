@@ -71,6 +71,12 @@ describe('SerialPort', function () {
             global.chrome.runtime.lastError = new Error({message: 'Failed to connect to the port.'});
           }
 
+          chai.assert.ok(options.bitrate, 'baudrate not set');
+          chai.assert.ok(options.dataBits, 'databits not set');
+          chai.assert.ok(options.parityBit, 'parity not set');
+          chai.assert.ok(options.stopBits, 'stopbits not set');
+          chai.assert.isBoolean(options.ctsFlowControl, 'flowcontrol not set');
+
           cb({
             bitrate: 9600,
             bufferSize: 4096,

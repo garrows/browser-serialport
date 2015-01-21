@@ -179,10 +179,10 @@ SerialPort.prototype.connectionId = -1;
 
 SerialPort.prototype.open = function (callback) {
   var options = {
-    bitrate: parseInt(this.options.baudrate, 10),
-    dataBits: this.options.databits,
+    bitrate: parseInt(this.options.baudRate, 10),
+    dataBits: this.options.dataBits,
     parityBit: this.options.parity,
-    stopBits: this.options.stopbits,
+    stopBits: this.options.stopBits,
     ctsFlowControl: this.options.rtscts
   };
 
