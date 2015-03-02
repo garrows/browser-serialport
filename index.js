@@ -189,6 +189,36 @@ SerialPort.prototype.open = function (callback) {
   this.options.serial.connect(this.path, options, this.proxy('onOpen', callback));
 };
 
+SerialPort.prototype.update = function (options, callback) {
+  if (this.connectionId < 0) {
+    var err = new Error('Serialport not open.');
+    if(typeof callback === 'function'){
+      callback(err);
+    }else{
+      this.emit('error', err);
+    }
+    return;
+  }
+
+  this.options.baudRate = options.baudRate | options.baudrate;
+
+  var options = {
+    bitrate: parseInt(this.options.baudRate, 10),
+    dataBits: this.options.dataBits,
+    parityBit: this.options.parity,
+    stopBits: this.options.stopBits,
+    ctsFlowControl: this.options.rtscts
+  };
+
+  this.options.serial.update(this.connectionId, options, function(result){
+    if (typeof callback === 'function') {
+      callback(chrome.runtime.lastError, result);
+    }
+  });
+
+};
+
+
 SerialPort.prototype.onOpen = function (callback, openInfo) {
   if(chrome.runtime.lastError){
     if(typeof callback === 'function'){
