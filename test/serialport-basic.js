@@ -2,6 +2,7 @@
 
 var sinon = require('sinon');
 var chai = require('chai');
+var without = require('lodash/array/without');
 var expect = chai.expect;
 
 var MockedSerialPort = require('../');
@@ -15,6 +16,8 @@ function unset(msg){
   };
 }
 
+var serialListeners = [];
+
 var hardware = {
   ports: {},
   createPort: function(path){
@@ -25,13 +28,14 @@ var hardware = {
     this.onReceive = unset('onreceive unset');
     this.onReceiveError = unset('onReceiveError unset');
   },
-  onReceive: unset('onreceive unset'),
+  onReceive: unset('onReceive unset'),
   onReceiveError: unset('onReceiveError unset'),
   emitData: function(buffer){
-    var self = this;
     process.nextTick(function(){
       var readInfo = {data: MockedSerialPort.buffer2ArrayBuffer(buffer), connectionId: 1};
-      self.onReceive(readInfo);
+      serialListeners.forEach(function(cb){
+        cb(readInfo);
+      });
     });
   },
   disconnect: function(path){
@@ -64,6 +68,8 @@ describe('SerialPort', function () {
 
     global.chrome = { runtime: { lastError: null } };
 
+    serialListeners = [];
+
     options = {
       serial: {
         connect: function(path, options, cb){
@@ -94,7 +100,10 @@ describe('SerialPort', function () {
         },
         onReceive: {
           addListener: function(cb){
-            hardware.onReceive = cb;
+            serialListeners.push(cb);
+          },
+          removeListener: function(cb){
+            serialListeners = without(serialListeners, cb);
           }
         },
         onReceiveError: {
@@ -280,9 +289,9 @@ describe('SerialPort', function () {
     it('calls the dataCallback if set', function (done) {
       var testData = new Buffer('I am a really short string');
       options.dataCallback = function (recvData) {
-          expect(recvData).to.eql(testData);
-          done();
-        }
+        expect(recvData).to.eql(testData);
+        done();
+      };
 
       var port = new SerialPort('/dev/exists', options, function () {
         hardware.emitData(testData);
@@ -314,17 +323,37 @@ describe('SerialPort', function () {
     it('emits data after being reopened', function (done) {
       var data = new Buffer('Howdy!');
       var port = new SerialPort('/dev/exists', options, function () {
-        port.close();
-        port.open(function () {
-          port.once('data', function (res) {
-            expect(res).to.eql(data);
-            done();
+        port.close(function () {
+          port.open(function () {
+            port.once('data', function (res) {
+              expect(res).to.eql(data);
+              done();
+            });
+            hardware.emitData(data);
           });
-          hardware.emitData(data);
         });
       });
     });
 
+    it('does not emit data twice if reopened', function (done) {
+      var data = new Buffer('Howdy!');
+      var port = new SerialPort('/dev/exists', options, function () {
+        port.close(function () {
+          port.open(function () {
+            var count = 0;
+            port.on('data', function (res) {
+              count++;
+            });
+            hardware.emitData(data);
+
+            setTimeout(function(){
+              expect(count).to.equal(1);
+              done();
+            }, 200);
+          });
+        });
+      });
+    });
   });
 
   describe('#send', function () {
