@@ -208,11 +208,13 @@ SerialPort.prototype.onOpen = function (callback, openInfo) {
 
   this.emit('open', openInfo);
 
+  this._reader = this.proxy('onRead');
+
+  this.options.serial.onReceive.addListener(this._reader);
+
   if(typeof callback === 'function'){
     callback(chrome.runtime.lastError, openInfo);
   }
-
-  this.options.serial.onReceive.addListener(this.proxy('onRead'));
 };
 
 SerialPort.prototype.onRead = function (readInfo) {
@@ -274,6 +276,10 @@ SerialPort.prototype.onClose = function (callback, result) {
   this.emit('close');
 
   this.removeAllListeners();
+  if(this._reader){
+    this.options.serial.onReceive.removeListener(this._reader);
+    this._reader = null;
+  }
 
   if (typeof callback === 'function') {
     callback(chrome.runtime.lastError, result);
