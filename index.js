@@ -154,9 +154,9 @@ function SerialPort(path, options, openImmediately, callback) {
         } else {
           self.emit('disconnect', err);
         }
-        self.connectionId = -1;
-        self.emit('close');
-        self.removeAllListeners();
+        if(self.connectionId >= 0){
+          self.close();
+        }
         break;
       case 'timeout':
         break;
