@@ -11,7 +11,7 @@ Robots in the browser. Just like [node-serialport](https://npmjs.org/package/ser
 
 You will not be able to add this to your normal website.
 
-This library only works in a [Chrome Packaged App](http://developer.chrome.com/apps/about_apps.html) as this is the only way to get access to the [serial ports API](http://developer.chrome.com/apps/serial.html) in the browser.
+This library only works in a [Chrome Packaged App](http://developer.chrome.com/apps/about_apps.html) as this is the only way to get access to the [serial ports API](http://developer.chrome.com/apps/serial.html) in the browser. Incidentally, since [NW.js](http://nwjs.io/) (a.k.a. node-webkit) now fully supports the Chrome Packaged App platform, this means you can also use this library in NW.js v0.13+.
 
 If you want help making your first Chrome App, read the ["Create Your First App"](http://developer.chrome.com/apps/first_app.html) tutorial.
 
