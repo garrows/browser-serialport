@@ -41,7 +41,7 @@ To Use
 Opening a serial port:
 
 ```js
-var SerialPort = require("browser-serialport").SerialPort
+var SerialPort = require("browser-serialport");
 var serialPort = new SerialPort("/dev/tty-usbserial1", {
   baudrate: 57600
 });
@@ -84,13 +84,14 @@ serialPort.on("open", function () {
 });
 ```
 
-You can also call the open function, in this case instanciate the serialport with an additional flag.
+You can also call the open function, in this case instantiate the serialport with an additional `autoOpen` property set to `false`.
 
 ```js
 var SerialPort = require("browser-serialport").SerialPort
 var serialPort = new SerialPort("/dev/tty-usbserial1", {
-  baudrate: 57600
-}, false); // this is the openImmediately flag [default is true]
+  baudrate: 57600,
+  autoOpen: false
+});
 
 serialPort.open(function (error) {
   if ( error ) {
