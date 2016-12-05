@@ -360,6 +360,10 @@ SerialPort.prototype.set = function (options, callback) {
   });
 };
 
+SerialPort.prototype.isOpen = function () {
+  return this.connectionId > -1;
+};
+
 function SerialPortList(callback) {
   if (typeof chrome != 'undefined' && chrome.serial) {
     chrome.serial.getDevices(function(ports) {
