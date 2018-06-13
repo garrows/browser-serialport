@@ -89,8 +89,9 @@ You can also call the open function, in this case instanciate the serialport wit
 ```js
 var SerialPort = require("browser-serialport").SerialPort
 var serialPort = new SerialPort("/dev/tty-usbserial1", {
-  baudrate: 57600
-}, false); // this is the openImmediately flag [default is true]
+  baudrate: 57600,
+  autoopen: false //autoopen flag [default is true]
+});
 
 serialPort.open(function (error) {
   if ( error ) {

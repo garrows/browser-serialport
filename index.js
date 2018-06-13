@@ -14,7 +14,8 @@ var _options = {
   rtscts: false,
   databits: 8,
   stopbits: 1,
-  buffersize: 256
+  buffersize: 256,
+  autoopen: true
 };
 
 function convertOptions(options){
@@ -45,7 +46,7 @@ function convertOptions(options){
   return options;
 }
 
-function SerialPort(path, options, openImmediately, callback) {
+function SerialPort(path, options, callback) {
 
   EE.call(this);
 
@@ -59,7 +60,7 @@ function SerialPort(path, options, openImmediately, callback) {
 
   options = (typeof options !== 'function') && options || {};
 
-  openImmediately = (openImmediately === undefined || openImmediately === null) ? true : openImmediately;
+  options.autoOpen = options.autoOpen || options.autoopen || _options.autoopen; 
 
   callback = callback || function (err) {
     if (err) {
@@ -166,7 +167,7 @@ function SerialPort(path, options, openImmediately, callback) {
 
   this.path = path;
 
-  if (openImmediately) {
+  if (options.autoOpen) {
     process.nextTick(function () {
       self.open(callback);
     });
