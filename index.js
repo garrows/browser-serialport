@@ -45,7 +45,7 @@ function convertOptions(options){
   return options;
 }
 
-function SerialPort(path, options, openImmediately, callback) {
+function SerialPort(path, options, callback) {
 
   EE.call(this);
 
@@ -59,7 +59,7 @@ function SerialPort(path, options, openImmediately, callback) {
 
   options = (typeof options !== 'function') && options || {};
 
-  openImmediately = (openImmediately === undefined || openImmediately === null) ? true : openImmediately;
+  var autoOpen = (options.autoOpen === undefined || options.autoOpen === null) ? true : options.autoOpen;
 
   callback = callback || function (err) {
     if (err) {
@@ -166,7 +166,7 @@ function SerialPort(path, options, openImmediately, callback) {
 
   this.path = path;
 
-  if (openImmediately) {
+  if (autoOpen) {
     process.nextTick(function () {
       self.open(callback);
     });
@@ -415,9 +415,8 @@ function toBuffer(ab) {
   return buffer;
 }
 
-module.exports = {
-  SerialPort: SerialPort,
-  list: SerialPortList,
-  buffer2ArrayBuffer: buffer2ArrayBuffer,
-  used: [] //TODO: Populate this somewhere.
-};
+SerialPort.buffer2ArrayBuffer = buffer2ArrayBuffer;
+SerialPort.list = SerialPortList;
+SerialPort.used = [];
+
+module.exports = SerialPort;

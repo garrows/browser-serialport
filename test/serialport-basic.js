@@ -6,7 +6,7 @@ var without = require('lodash/array/without');
 var expect = chai.expect;
 
 var MockedSerialPort = require('../');
-var SerialPort = MockedSerialPort.SerialPort;
+var SerialPort = MockedSerialPort;
 
 var options;
 
