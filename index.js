@@ -365,25 +365,42 @@ SerialPort.prototype.isOpen = function () {
 };
 
 function SerialPortList(callback) {
+
   if (typeof chrome != 'undefined' && chrome.serial) {
-    chrome.serial.getDevices(function(ports) {
-      var portObjects = new Array(ports.length);
-      for (var i = 0; i < ports.length; i++) {
-        portObjects[i] = {
-          comName: ports[i].path,
-          manufacturer: ports[i].displayName,
-          serialNumber: '',
-          pnpId: '',
-          locationId:'',
-          vendorId: '0x' + (ports[i].vendorId||0).toString(16),
-          productId: '0x' + (ports[i].productId||0).toString(16)
-        };
-      }
-      callback(chrome.runtime.lastError, portObjects);
+
+    return new Promise(resolve => {
+
+      chrome.serial.getDevices(function(ports) {
+
+        var portObjects = new Array(ports.length);
+
+        for (var i = 0; i < ports.length; i++) {
+          portObjects[i] = {
+            comName: ports[i].path, // backwards-compatibility with older versions of serialport
+            path: ports[i].path,
+            manufacturer: ports[i].displayName,
+            serialNumber: '',
+            pnpId: '',
+            locationId:'',
+            vendorId: '0x' + (ports[i].vendorId||0).toString(16),
+            productId: '0x' + (ports[i].productId||0).toString(16)
+          };
+        }
+
+        if (typeof callback === "function") callback(chrome.runtime.lastError, portObjects);
+        resolve(portObjects);
+
+      });
+
     });
+
   } else {
-    callback(new Error('No access to serial ports. Try loading as a Chrome Application.'), null);
+    var error = new Error('No access to serial ports. Try loading as a Chrome Application.');
+    callback(error, null);
+    return Promise.reject(error);
   }
+
+
 }
 
 // Convert string to ArrayBuffer
